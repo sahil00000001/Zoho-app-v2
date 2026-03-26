@@ -157,32 +157,27 @@ export default function DashboardPage() {
           <h2 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-3">Recent Activity</h2>
           <div className="card overflow-hidden">
             <div className="divide-y divide-gray-50">
-              {activity.slice(0, 6).map((item, i) => (
+              {activity.map((item, i) => (
                 <div
                   key={item.id}
                   className="flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50/80 transition-colors group"
-                  style={{ animationDelay: `${i * 0.05}s` }}
+                  style={{ animationDelay: `${i * 0.04}s` }}
                 >
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-base shrink-0 ${
-                    item.type === "leave" ? "bg-green-50" : item.type === "attendance" ? "bg-blue-50" : "bg-gray-50"
-                  }`}>
-                    {item.type === "leave" ? "🌿" : item.type === "attendance" ? "🕐" : "📋"}
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-base shrink-0 ${ACTIVITY_ICON_BG[item.type] ?? "bg-gray-50"}`}>
+                    {ACTIVITY_ICON[item.type] ?? "📋"}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-800 truncate group-hover:text-gray-900">{item.title}</p>
                     <p className="text-xs text-gray-400 mt-0.5">
                       {new Date(item.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                      {" · "}
+                      {new Date(item.date).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
                     </p>
                   </div>
-                  <StatusBadge status={item.status} />
+                  <ActivityStatusBadge type={item.type} status={item.status} />
                 </div>
               ))}
             </div>
-            {activity.length > 6 && (
-              <div className="px-5 py-3 border-t border-gray-50 bg-gray-50/30">
-                <span className="text-xs text-gray-400">{activity.length - 6} more activities</span>
-              </div>
-            )}
           </div>
         </div>
       )}
@@ -196,6 +191,47 @@ export default function DashboardPage() {
       )}
     </div>
   );
+}
+
+/* ── Activity helpers ── */
+
+const ACTIVITY_ICON: Record<string, string> = {
+  leave:          "🌿",
+  announcement:   "📢",
+  regularization: "🔧",
+  manager_change: "👥",
+  new_user:       "🎉",
+  attendance:     "🕐",
+};
+const ACTIVITY_ICON_BG: Record<string, string> = {
+  leave:          "bg-green-50",
+  announcement:   "bg-purple-50",
+  regularization: "bg-orange-50",
+  manager_change: "bg-blue-50",
+  new_user:       "bg-pink-50",
+  attendance:     "bg-blue-50",
+};
+
+function ActivityStatusBadge({ type, status }: { type: string; status: string }) {
+  if (type === "announcement") {
+    const map: Record<string, string> = {
+      URGENT: "badge bg-red-100 text-red-700",
+      HIGH:   "badge bg-orange-100 text-orange-700",
+      NORMAL: "badge bg-purple-100 text-purple-700",
+    };
+    return <span className={map[status] ?? "badge badge-gray"}>{status === "NORMAL" ? "Posted" : status}</span>;
+  }
+  if (type === "manager_change") return <span className="badge bg-blue-100 text-blue-700">Updated</span>;
+  if (type === "new_user") return <span className="badge bg-green-100 text-green-700">Joined</span>;
+  const map: Record<string, string> = {
+    PENDING:   "badge badge-pending",
+    APPROVED:  "badge badge-approved",
+    REJECTED:  "badge badge-rejected",
+    CANCELLED: "badge badge-gray",
+    ACTIVE:    "badge badge-approved",
+    UPDATED:   "badge bg-blue-100 text-blue-700",
+  };
+  return <span className={map[status] || "badge badge-gray"}>{status.charAt(0) + status.slice(1).toLowerCase()}</span>;
 }
 
 /* ── Sub-components ── */
