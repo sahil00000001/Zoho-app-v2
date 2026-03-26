@@ -90,6 +90,8 @@ export const api = {
     request(`/api/attendance/monthly${month ? `?month=${month}` : ''}`),
   getTeamAttendance: (date?: string) =>
     request(`/api/attendance/team${date ? `?date=${date}` : ''}`),
+  getDailyAttendance: (date?: string) =>
+    request<TeamDailyEntry[]>(`/api/attendance/daily${date ? `?date=${date}` : ''}`),
   getRegularizations: () => request('/api/attendance/regularizations'),
   submitRegularization: (data: { date: string; reason: string; requestedCheckIn?: string; requestedCheckOut?: string }) =>
     request('/api/attendance/regularizations', { method: 'POST', body: JSON.stringify(data) }),
@@ -376,6 +378,28 @@ export interface AnnouncementData {
   departmentId?: string;
   expiresAt?: string;
   isPinned?: boolean;
+}
+
+export interface TeamDailyEntry {
+  user: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    employeeId: string;
+    designation?: string;
+    department?: { name: string };
+  };
+  attendance: {
+    id: string;
+    checkInTime: string | null;
+    checkOutTime: string | null;
+    checkInAddress?: string | null;
+    checkOutAddress?: string | null;
+    workHours: number | null;
+    overtimeHours: number | null;
+    isWFH: boolean;
+    status: string;
+  } | null;
 }
 
 export interface CalendarLeave {
