@@ -11,6 +11,7 @@ const PAGE_META: Record<string, { title: string; icon: string }> = {
   "/dashboard/announcements": { title: "Announcements", icon: "📢" },
   "/dashboard/approvals":     { title: "Approvals",     icon: "✅" },
   "/dashboard/profile":       { title: "My Profile",    icon: "👤" },
+  "/dashboard/employees":     { title: "Employees",     icon: "👥" },
 };
 
 export default function TopBar() {
