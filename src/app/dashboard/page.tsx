@@ -152,41 +152,31 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Recent Activity ── */}
-      {!loading && activity.length > 0 && (
+      {!loading && (
         <div className="animate-fade-in-up delay-200">
           <h2 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-3">Recent Activity</h2>
-          <div className="card overflow-hidden">
-            <div className="divide-y divide-gray-50">
-              {activity.map((item, i) => (
-                <div
-                  key={item.id}
-                  className="flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50/80 transition-colors group"
-                  style={{ animationDelay: `${i * 0.04}s` }}
-                >
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-base shrink-0 ${ACTIVITY_ICON_BG[item.type] ?? "bg-gray-50"}`}>
-                    {ACTIVITY_ICON[item.type] ?? "📋"}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-800 truncate group-hover:text-gray-900">{item.title}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      {new Date(item.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-                      {" · "}
-                      {new Date(item.date).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
-                    </p>
-                  </div>
-                  <ActivityStatusBadge type={item.type} status={item.status} />
-                </div>
-              ))}
+          {activity.length === 0 ? (
+            <div className="card p-8 text-center">
+              <p className="text-sm text-gray-400">No recent activity yet</p>
             </div>
-          </div>
-        </div>
-      )}
-
-      {!loading && activity.length === 0 && (
-        <div className="card p-10 text-center animate-fade-in-up delay-200">
-          <div className="text-4xl mb-3 animate-float">📊</div>
-          <h3 className="font-semibold text-gray-700 mb-1">No recent activity</h3>
-          <p className="text-sm text-gray-400">Your recent actions will appear here</p>
+          ) : (
+            <div className="card p-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+                {activity.map((item) => (
+                  <div key={item.id} className="flex items-start gap-2.5 py-2 border-b border-gray-50 last:border-0">
+                    <span className="mt-0.5 shrink-0 text-sm leading-none">{ACTIVITY_ICON[item.type] ?? "📋"}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-700 leading-snug line-clamp-1">{item.title}</p>
+                      <p className="text-[11px] text-gray-400 mt-0.5">{timeAgo(item.date)}</p>
+                    </div>
+                    <span className={`shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded-full mt-0.5 ${ACTIVITY_STATUS_COLOR[item.status] ?? "bg-gray-100 text-gray-500"}`}>
+                      {ACTIVITY_STATUS_LABEL[item.status] ?? item.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -203,35 +193,33 @@ const ACTIVITY_ICON: Record<string, string> = {
   new_user:       "🎉",
   attendance:     "🕐",
 };
-const ACTIVITY_ICON_BG: Record<string, string> = {
-  leave:          "bg-green-50",
-  announcement:   "bg-purple-50",
-  regularization: "bg-orange-50",
-  manager_change: "bg-blue-50",
-  new_user:       "bg-pink-50",
-  attendance:     "bg-blue-50",
+const ACTIVITY_STATUS_COLOR: Record<string, string> = {
+  PENDING:   "bg-yellow-100 text-yellow-700",
+  APPROVED:  "bg-green-100 text-green-700",
+  REJECTED:  "bg-red-100 text-red-600",
+  CANCELLED: "bg-gray-100 text-gray-500",
+  ACTIVE:    "bg-green-100 text-green-700",
+  UPDATED:   "bg-blue-100 text-blue-700",
+  URGENT:    "bg-red-100 text-red-700",
+  HIGH:      "bg-orange-100 text-orange-700",
+  NORMAL:    "bg-purple-100 text-purple-600",
+};
+const ACTIVITY_STATUS_LABEL: Record<string, string> = {
+  PENDING: "Pending", APPROVED: "Approved", REJECTED: "Rejected",
+  CANCELLED: "Cancelled", ACTIVE: "Active", UPDATED: "Updated",
+  URGENT: "Urgent", HIGH: "High", NORMAL: "Posted",
 };
 
-function ActivityStatusBadge({ type, status }: { type: string; status: string }) {
-  if (type === "announcement") {
-    const map: Record<string, string> = {
-      URGENT: "badge bg-red-100 text-red-700",
-      HIGH:   "badge bg-orange-100 text-orange-700",
-      NORMAL: "badge bg-purple-100 text-purple-700",
-    };
-    return <span className={map[status] ?? "badge badge-gray"}>{status === "NORMAL" ? "Posted" : status}</span>;
-  }
-  if (type === "manager_change") return <span className="badge bg-blue-100 text-blue-700">Updated</span>;
-  if (type === "new_user") return <span className="badge bg-green-100 text-green-700">Joined</span>;
-  const map: Record<string, string> = {
-    PENDING:   "badge badge-pending",
-    APPROVED:  "badge badge-approved",
-    REJECTED:  "badge badge-rejected",
-    CANCELLED: "badge badge-gray",
-    ACTIVE:    "badge badge-approved",
-    UPDATED:   "badge bg-blue-100 text-blue-700",
-  };
-  return <span className={map[status] || "badge badge-gray"}>{status.charAt(0) + status.slice(1).toLowerCase()}</span>;
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return "just now";
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  if (d < 7) return `${d}d ago`;
+  return new Date(dateStr).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
 }
 
 /* ── Sub-components ── */
