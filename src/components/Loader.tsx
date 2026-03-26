@@ -86,7 +86,7 @@ export function PageLoader({ label = "Loading" }: { label?: string }) {
             className="relative w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg"
             style={{ background: "linear-gradient(135deg, rgb(220,38,38), rgb(249,115,22))" }}
           >
-            <span className="text-white font-black text-2xl select-none">P</span>
+            <span className="text-white font-black text-2xl select-none">A</span>
           </div>
         </div>
 
