@@ -145,8 +145,15 @@ export default function ProfilePage() {
   const [kraFile, setKraFile] = useState<File | null>(null);
   const [kraUploading, setKraUploading] = useState(false);
 
+  // Admin controls
+  const [allUsers, setAllUsers] = useState<{ id: string; firstName: string; lastName: string; employeeId: string; managerId?: string; manager?: { id: string; firstName: string; lastName: string } }[]>([]);
+  const [adminEditUserId, setAdminEditUserId] = useState('');
+  const [adminEditManagerId, setAdminEditManagerId] = useState('');
+  const [adminSaving, setAdminSaving] = useState(false);
+
   const isHRAdmin = isRole('HR', 'ADMIN');
   const isManager = isRole('MANAGER');
+  const isAdmin = isRole('ADMIN');
 
   const loadProfile = useCallback(async () => {
     try {
@@ -179,10 +186,16 @@ export default function ProfilePage() {
           setAllKRA(kra);
         } catch {}
       }
+      if (isAdmin) {
+        try {
+          const users = await api.getUsers({ isActive: 'true' }) as typeof allUsers;
+          setAllUsers(users);
+        } catch {}
+      }
       setLoading(false);
     }
     load();
-  }, [isHRAdmin, isManager, loadProfile]);
+  }, [isHRAdmin, isManager, isAdmin, loadProfile]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function showSuccess(msg: string) {
     setSuccess(msg);
@@ -331,6 +344,24 @@ export default function ProfilePage() {
     a.click();
   }
 
+  async function handleAdminManagerSave() {
+    if (!adminEditUserId || !adminEditManagerId) return;
+    setAdminSaving(true);
+    try {
+      await api.assignManager(adminEditUserId, adminEditManagerId === '__none__' ? null : adminEditManagerId);
+      // Refresh user list
+      const users = await api.getUsers({ isActive: 'true' }) as typeof allUsers;
+      setAllUsers(users);
+      showSuccess('Manager updated successfully');
+      setAdminEditUserId('');
+      setAdminEditManagerId('');
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to update manager');
+    } finally {
+      setAdminSaving(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -361,42 +392,51 @@ export default function ProfilePage() {
 
       {/* Profile header */}
       <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden mb-6">
-        <div className="h-24 w-full" style={{ background: 'linear-gradient(135deg, rgb(220,38,38), rgb(249,115,22))' }} />
-        <div className="px-6 pb-5">
-          <div className="flex items-end gap-4 -mt-10 mb-4">
-            {/* Avatar */}
-            <div className="relative">
-              <div className="w-20 h-20 rounded-2xl border-4 border-white shadow-md overflow-hidden bg-gray-100 flex items-center justify-center">
+        {/* Orange banner */}
+        <div className="h-36 w-full relative" style={{ background: 'linear-gradient(135deg, rgb(220,38,38), rgb(249,115,22))' }}>
+          <div className="absolute top-5 right-10 w-28 h-28 rounded-full bg-white/10" />
+          <div className="absolute -top-3 right-28 w-16 h-16 rounded-full bg-white/10" />
+          <div className="absolute bottom-4 left-1/2 w-10 h-10 rounded-full bg-white/10" />
+        </div>
+        <div className="px-6 pb-6">
+          {/* Avatar row — overlaps the orange banner */}
+          <div className="flex items-end gap-4 -mt-14 mb-4">
+            <div className="relative shrink-0">
+              <div className="w-24 h-24 rounded-2xl border-4 border-white shadow-lg overflow-hidden bg-gray-100 flex items-center justify-center">
                 {profile?.photoUrl ? (
                   <img src={profile.photoUrl} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-2xl font-bold text-gray-400">{initials}</span>
+                  <span className="text-3xl font-bold text-gray-400">{initials}</span>
                 )}
               </div>
               <button
                 onClick={() => photoRef.current?.click()}
                 disabled={saving}
-                className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-white border border-gray-200 shadow flex items-center justify-center hover:bg-gray-50 text-xs"
+                className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-white border border-gray-200 shadow flex items-center justify-center hover:bg-gray-50 text-sm"
                 title="Change photo"
               >
                 📷
               </button>
               <input ref={photoRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
             </div>
-            <div className="pb-1">
-              <h1 className="text-xl font-bold text-gray-900">{u?.firstName} {u?.lastName}</h1>
-              <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                {u?.designation && <span className="text-sm text-gray-500">{u.designation}</span>}
-                {u?.department && <span className="text-xs text-gray-400">· {u.department.name}</span>}
-                {u?.role && (
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${ROLE_BADGE[u.role] || 'bg-gray-100 text-gray-600'}`}>
-                    {u.role}
-                  </span>
-                )}
-              </div>
+            {/* Spacer to align button row to avatar bottom */}
+            <div className="pb-1 invisible select-none" aria-hidden>placeholder</div>
+          </div>
+          {/* Name & role — clearly in the white area */}
+          <div className="mb-5">
+            <h1 className="text-2xl font-bold text-gray-900 leading-tight">{u?.firstName} {u?.lastName}</h1>
+            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+              {u?.designation && <span className="text-sm text-gray-500 font-medium">{u.designation}</span>}
+              {u?.department && <span className="text-sm text-gray-400">· {u.department.name}</span>}
+              {u?.role && (
+                <span className={`text-xs px-2.5 py-0.5 rounded-full font-semibold ${ROLE_BADGE[u.role] || 'bg-gray-100 text-gray-600'}`}>
+                  {u.role}
+                </span>
+              )}
             </div>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {/* Info grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-gray-100">
             {[
               { label: 'Employee ID', value: u?.employeeId },
               { label: 'Email', value: u?.email },
@@ -404,7 +444,7 @@ export default function ProfilePage() {
               { label: 'Manager', value: u?.manager ? `${u.manager.firstName} ${u.manager.lastName}` : '—' },
             ].map(f => (
               <div key={f.label}>
-                <div className="text-xs text-gray-400">{f.label}</div>
+                <div className="text-xs text-gray-400 mb-0.5">{f.label}</div>
                 <div className="text-sm font-medium text-gray-800 truncate">{f.value || '—'}</div>
               </div>
             ))}
@@ -927,6 +967,121 @@ export default function ProfilePage() {
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {/* ── Admin Controls ──────────────────────────────────────── */}
+      {isAdmin && (
+        <div className="mt-6 bg-white border border-red-100 rounded-2xl shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-red-50" style={{ background: 'linear-gradient(90deg, rgb(255,245,245), rgb(255,250,245))' }}>
+            <div className="flex items-center gap-2">
+              <span className="text-base">🛡️</span>
+              <h2 className="font-bold text-gray-900 text-sm">Admin Controls</h2>
+              <span className="text-xs bg-red-100 text-red-600 font-semibold px-2 py-0.5 rounded-full">ADMIN ONLY</span>
+            </div>
+            <p className="text-xs text-gray-400 mt-1">Change manager assignments for any employee</p>
+          </div>
+          <div className="p-5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+              {/* Employee selector */}
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1.5">Select Employee</label>
+                <select
+                  value={adminEditUserId}
+                  onChange={e => {
+                    const uid = e.target.value;
+                    setAdminEditUserId(uid);
+                    const found = allUsers.find(u => u.id === uid);
+                    setAdminEditManagerId(found?.manager?.id ?? '');
+                  }}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200 bg-white"
+                >
+                  <option value="">— Choose employee —</option>
+                  {allUsers.map(u => (
+                    <option key={u.id} value={u.id}>
+                      {u.firstName} {u.lastName} ({u.employeeId})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Manager selector */}
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1.5">Assign Manager</label>
+                <select
+                  value={adminEditManagerId}
+                  onChange={e => setAdminEditManagerId(e.target.value)}
+                  disabled={!adminEditUserId}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200 bg-white disabled:bg-gray-50 disabled:text-gray-400"
+                >
+                  <option value="">— No manager —</option>
+                  {allUsers
+                    .filter(u => u.id !== adminEditUserId)
+                    .map(u => (
+                      <option key={u.id} value={u.id}>
+                        {u.firstName} {u.lastName} ({u.employeeId})
+                      </option>
+                    ))}
+                </select>
+                {adminEditUserId && (() => {
+                  const found = allUsers.find(u => u.id === adminEditUserId);
+                  const current = found?.manager;
+                  return current ? (
+                    <p className="text-xs text-gray-400 mt-1">
+                      Current: {current.firstName} {current.lastName}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-gray-400 mt-1">No manager assigned</p>
+                  );
+                })()}
+              </div>
+
+              {/* Save button */}
+              <button
+                onClick={handleAdminManagerSave}
+                disabled={adminSaving || !adminEditUserId}
+                className="px-5 py-2 rounded-xl text-sm font-semibold text-white disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                style={{ background: 'linear-gradient(90deg, rgb(220,38,38), rgb(249,115,22))' }}
+              >
+                {adminSaving ? (
+                  <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Saving...</>
+                ) : (
+                  'Update Manager'
+                )}
+              </button>
+            </div>
+
+            {/* Quick overview table */}
+            {allUsers.length > 0 && (
+              <div className="mt-5">
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">All Employees — Manager Overview</h3>
+                <div className="rounded-xl border border-gray-100 overflow-hidden">
+                  <div className="max-h-64 overflow-y-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-50 sticky top-0">
+                        <tr>
+                          <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500">Employee</th>
+                          <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500">ID</th>
+                          <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500">Manager</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-50">
+                        {allUsers.map(u => (
+                          <tr key={u.id} className="hover:bg-gray-50/50">
+                            <td className="px-4 py-2.5 font-medium text-gray-800">{u.firstName} {u.lastName}</td>
+                            <td className="px-4 py-2.5 text-gray-400 text-xs">{u.employeeId}</td>
+                            <td className="px-4 py-2.5 text-gray-500">
+                              {u.manager ? `${u.manager.firstName} ${u.manager.lastName}` : <span className="text-gray-300 italic">None</span>}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
