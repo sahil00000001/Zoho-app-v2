@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(curl -s -X POST https://zoho-backend-rho.vercel.app/api/auth/login -H \"Content-Type: application/json\" -d '{\"\"\"\"email\"\"\"\":\"\"\"\"vashishtsahil9999@gmail.com\"\"\"\"}')",
+      "Bash(curl -s https://zoho-backend-rho.vercel.app/api/users -H \"Authorization: Bearer invalid_token\")",
+      "Bash(node -e \"const { PrismaClient } = require\\(''@prisma/client''\\); const p = new PrismaClient\\(\\); console.log\\(Object.keys\\(p\\).filter\\(k => k.toLowerCase\\(\\).includes\\(''kra''\\)\\)\\);\")",
+      "Bash(xargs head:*)"
+    ]
+  }
+}

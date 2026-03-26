@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s https://zoho-backend-rho.vercel.app/api/health)",
+      "Bash(curl -s -X POST https://zoho-backend-rho.vercel.app/api/auth/login -H \"Content-Type: application/json\" -d '{\"\"email\"\":\"\"admin@company.com\"\"}')",
+      "Bash(curl -s https://zoho-backend-rho.vercel.app/api/health -v)",
+      "Bash(curl -s https://zoho-backend-rho.vercel.app/api/leave-types)",
+      "Bash(curl -s https://zoho-backend-rho.vercel.app/api/auth/me)",
+      "Bash(curl -sv -X POST https://zoho-backend-rho.vercel.app/api/auth/login -H \"Content-Type: application/json\" -d '{\"\"\"\"email\"\"\"\":\"\"\"\"admin@company.com\"\"\"\"}')",
+      "Bash(vercel --version)"
+    ]
+  }
+}
