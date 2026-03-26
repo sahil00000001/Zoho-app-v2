@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
+import { SectionLoader } from '@/components/Loader';
 
 type Priority = 'HIGH' | 'NORMAL' | 'LOW';
 type AnnType = 'COMPANY' | 'DEPARTMENT';
@@ -186,11 +187,7 @@ export default function AnnouncementsPage() {
   const totalCelebrations = celebrations.birthdays.length + celebrations.anniversaries.length;
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-10 h-10 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+    return <SectionLoader label="Loading announcements" />;
   }
 
   return (
