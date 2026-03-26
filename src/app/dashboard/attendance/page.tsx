@@ -115,7 +115,7 @@ export default function AttendancePage() {
     ]);
 
     if (todayRes.status === 'fulfilled') setTodayRecord(todayRes.value as AttendanceRecord);
-    else setTodayErr('Could not load today's record');
+    else setTodayErr("Could not load today's record");
 
     if (histRes.status === 'fulfilled') setHistory(histRes.value as AttendanceRecord[]);
     if (monRes.status === 'fulfilled') setMonthly(monRes.value as AttendanceRecord[]);
