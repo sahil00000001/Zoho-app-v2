@@ -48,6 +48,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    // Warm up the backend immediately — prevents cold-start delay on first real API call
+    api.warmup();
+
     const stored = localStorage.getItem('user');
     const storedPerms = localStorage.getItem('permissions');
     if (stored) {
@@ -59,18 +62,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const { accessToken } = api.getTokens();
     if (accessToken) {
-      // getMe() is the auth gate — if it fails, clear session
-      // getMyPermissions() is best-effort — failure must never log the user out
-      api.getMe()
-        .then(async (u) => {
+      // Run getMe + getMyPermissions in parallel instead of sequentially
+      Promise.all([
+        api.getMe(),
+        api.getMyPermissions().catch(() => null),
+      ])
+        .then(([u, perms]) => {
           setUser(u);
           localStorage.setItem('user', JSON.stringify(u));
-          try {
-            const perms = await api.getMyPermissions();
+          if (perms) {
             setPermissions(perms);
             localStorage.setItem('permissions', JSON.stringify(perms));
-          } catch {
-            // permissions endpoint failed — fall back to defaults, keep user logged in
           }
         })
         .catch(() => {
@@ -83,6 +85,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } else {
       setLoading(false);
     }
+
+    // Keepalive — ping every 4 minutes so the serverless function stays warm
+    const keepalive = setInterval(() => api.warmup(), 4 * 60 * 1000);
+    return () => clearInterval(keepalive);
   }, []);
 
   const login = useCallback(async (email: string, otp: string) => {

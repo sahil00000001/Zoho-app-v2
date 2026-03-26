@@ -1,5 +1,24 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
+// ── In-memory GET cache (60s TTL) ─────────────────────────────────────────
+const _cache = new Map<string, { data: unknown; expiresAt: number }>();
+const CACHE_TTL = 60_000;
+
+function cacheGet<T>(key: string): T | null {
+  const entry = _cache.get(key);
+  if (entry && entry.expiresAt > Date.now()) return entry.data as T;
+  return null;
+}
+function cacheSet(key: string, data: unknown) {
+  _cache.set(key, { data, expiresAt: Date.now() + CACHE_TTL });
+}
+export function invalidateCache(prefix?: string) {
+  if (!prefix) { _cache.clear(); return; }
+  for (const key of _cache.keys()) {
+    if (key.startsWith(prefix)) _cache.delete(key);
+  }
+}
+
 function getTokens() {
   if (typeof window === 'undefined') return { accessToken: null, refreshToken: null };
   return {
@@ -20,6 +39,20 @@ function clearTokens() {
 }
 
 async function request<T>(path: string, options: RequestInit = {}, retry = true): Promise<T> {
+  const method = (options.method ?? 'GET').toUpperCase();
+
+  // Return cached response immediately for GET requests
+  if (method === 'GET') {
+    const cached = cacheGet<T>(path);
+    if (cached !== null) return cached;
+  }
+
+  // Invalidate related cache on mutations
+  if (method !== 'GET') {
+    const prefix = '/' + path.split('/').slice(1, 3).join('/');
+    invalidateCache(prefix);
+  }
+
   const { accessToken, refreshToken } = getTokens();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -43,14 +76,16 @@ async function request<T>(path: string, options: RequestInit = {}, retry = true)
         return request<T>(path, options, false);
       }
     } catch {}
-    // Clear tokens and throw — let AuthGuard handle the redirect
-    // (never use window.location here — it fires mid-login and sends users back to /login)
     clearTokens();
     throw new Error('Session expired. Please log in again.');
   }
 
   const data = await res.json();
   if (!res.ok) throw new Error(data.error?.message || 'Request failed');
+
+  // Cache successful GET responses
+  if (method === 'GET') cacheSet(path, data.data);
+
   return data.data as T;
 }
 
@@ -243,6 +278,9 @@ export const api = {
   setTokens,
   clearTokens,
   getTokens,
+
+  // Warm up the backend serverless function (fire-and-forget)
+  warmup: () => fetch(`${API_BASE}/api/health`, { cache: 'no-store' }).catch(() => {}),
 };
 
 // Types
