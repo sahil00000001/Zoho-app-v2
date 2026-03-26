@@ -1,8 +1,11 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
-// ── In-memory GET cache (60s TTL) ─────────────────────────────────────────
+// ── In-memory GET cache ───────────────────────────────────────────────────
 const _cache = new Map<string, { data: unknown; expiresAt: number }>();
-const CACHE_TTL = 60_000;
+// Longer TTL for data that rarely changes (leave types, departments, holidays)
+const STABLE_ROUTES = ['/api/leave-types', '/api/users/departments', '/api/holidays', '/api/roles/modules'];
+const CACHE_TTL        = 60_000;   // 60s for regular data
+const STABLE_CACHE_TTL = 300_000;  // 5 min for stable reference data
 
 function cacheGet<T>(key: string): T | null {
   const entry = _cache.get(key);
@@ -10,7 +13,8 @@ function cacheGet<T>(key: string): T | null {
   return null;
 }
 function cacheSet(key: string, data: unknown) {
-  _cache.set(key, { data, expiresAt: Date.now() + CACHE_TTL });
+  const ttl = STABLE_ROUTES.some(r => key.startsWith(r)) ? STABLE_CACHE_TTL : CACHE_TTL;
+  _cache.set(key, { data, expiresAt: Date.now() + ttl });
 }
 export function invalidateCache(prefix?: string) {
   if (!prefix) { _cache.clear(); return; }
@@ -18,6 +22,10 @@ export function invalidateCache(prefix?: string) {
     if (key.startsWith(prefix)) _cache.delete(key);
   }
 }
+
+// ── In-flight deduplication ───────────────────────────────────────────────
+// Prevents duplicate HTTP requests when two components request the same URL simultaneously
+const _inflight = new Map<string, Promise<unknown>>();
 
 function getTokens() {
   if (typeof window === 'undefined') return { accessToken: null, refreshToken: null };
@@ -38,21 +46,7 @@ function clearTokens() {
   localStorage.removeItem('user');
 }
 
-async function request<T>(path: string, options: RequestInit = {}, retry = true): Promise<T> {
-  const method = (options.method ?? 'GET').toUpperCase();
-
-  // Return cached response immediately for GET requests
-  if (method === 'GET') {
-    const cached = cacheGet<T>(path);
-    if (cached !== null) return cached;
-  }
-
-  // Invalidate related cache on mutations
-  if (method !== 'GET') {
-    const prefix = '/' + path.split('/').slice(1, 3).join('/');
-    invalidateCache(prefix);
-  }
-
+async function fetchOnce<T>(path: string, options: RequestInit, retry: boolean): Promise<T> {
   const { accessToken, refreshToken } = getTokens();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -63,7 +57,6 @@ async function request<T>(path: string, options: RequestInit = {}, retry = true)
   const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
 
   if (res.status === 401 && retry && refreshToken) {
-    // Try token refresh
     try {
       const refreshRes = await fetch(`${API_BASE}/api/auth/refresh`, {
         method: 'POST',
@@ -73,7 +66,7 @@ async function request<T>(path: string, options: RequestInit = {}, retry = true)
       if (refreshRes.ok) {
         const data = await refreshRes.json();
         setTokens(data.data.accessToken, data.data.refreshToken);
-        return request<T>(path, options, false);
+        return fetchOnce<T>(path, options, false);
       }
     } catch {}
     clearTokens();
@@ -82,11 +75,37 @@ async function request<T>(path: string, options: RequestInit = {}, retry = true)
 
   const data = await res.json();
   if (!res.ok) throw new Error(data.error?.message || 'Request failed');
-
-  // Cache successful GET responses
-  if (method === 'GET') cacheSet(path, data.data);
-
   return data.data as T;
+}
+
+async function request<T>(path: string, options: RequestInit = {}, retry = true): Promise<T> {
+  const method = (options.method ?? 'GET').toUpperCase();
+
+  if (method === 'GET') {
+    // 1. Return from cache if fresh
+    const cached = cacheGet<T>(path);
+    if (cached !== null) return cached;
+
+    // 2. Deduplicate: if an identical request is already in-flight, share its promise
+    const existing = _inflight.get(path);
+    if (existing) return existing as Promise<T>;
+
+    // 3. Fire the request, register it as in-flight, cache on success
+    const promise = fetchOnce<T>(path, options, retry).then((result) => {
+      cacheSet(path, result);
+      return result;
+    }).finally(() => {
+      _inflight.delete(path);
+    });
+    _inflight.set(path, promise);
+    return promise;
+  }
+
+  // Mutations: invalidate related cache keys
+  const prefix = '/' + path.split('/').slice(1, 3).join('/');
+  invalidateCache(prefix);
+
+  return fetchOnce<T>(path, options, retry);
 }
 
 export const api = {
