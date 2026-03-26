@@ -21,21 +21,55 @@ function SkeletonCard() {
   );
 }
 
+interface TodayRecord {
+  checkInTime?: string | null;
+  checkOutTime?: string | null;
+  workHours?: number | null;
+  overtimeHours?: number | null;
+  status?: string;
+  isWFH?: boolean;
+}
+
+interface BalanceItem {
+  leaveType: { id: string; name: string };
+  maxDays: number;
+  usedDays: number;
+  remainingDays: number;
+}
+
+function fmtTime(iso: string) {
+  return new Date(iso).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
+}
+
+function elapsed(iso: string) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+
 export default function DashboardPage() {
   const { user, isRole } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [todayAtt, setTodayAtt] = useState<TodayRecord | null | undefined>(undefined);
+  const [balance, setBalance] = useState<BalanceItem[]>([]);
   const greeting = getGreeting();
 
   useEffect(() => {
-    Promise.all([api.getStats(), api.getActivity()])
-      .then(([s, a]) => {
-        setStats(s as DashboardStats);
-        setActivity(a as ActivityItem[]);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    Promise.allSettled([
+      api.getStats(),
+      api.getActivity(),
+      api.getTodayAttendance(),
+      api.getLeaveBalance(),
+    ]).then(([s, a, t, b]) => {
+      if (s.status === "fulfilled") setStats(s.value as DashboardStats);
+      if (a.status === "fulfilled") setActivity(a.value as ActivityItem[]);
+      if (t.status === "fulfilled") setTodayAtt((t.value as TodayRecord) ?? null);
+      else setTodayAtt(null);
+      if (b.status === "fulfilled") setBalance(b.value as BalanceItem[]);
+    }).finally(() => setLoading(false));
   }, []);
 
   const today = new Date().toLocaleDateString("en-IN", {
@@ -130,24 +164,189 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ── Quick Actions ── */}
+      {/* ── At a Glance ── */}
       <div>
-        <h2 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-3">Quick Actions</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
-          <QuickAction href="/dashboard/attendance" icon="🕐" label="Attendance" sub="Check in / out" color="blue" />
-          <QuickAction href="/dashboard/leaves" icon="🌿" label="Apply Leave" sub="Request time off" color="green" />
-          <QuickAction href="/dashboard/announcements" icon="📢" label="Announcements" sub="Latest updates" color="purple" />
-          <QuickAction href="/dashboard/profile" icon="👤" label="My Profile" sub="View & edit info" color="orange" />
-          {isRole("MANAGER", "HR", "ADMIN") && (
-            <QuickAction href="/dashboard/approvals" icon="✅" label="Approvals" sub="Review requests" color="red" />
-          )}
-          {isRole("HR", "ADMIN") && (
-            <QuickAction href="/dashboard/onboarding" icon="🚀" label="Onboarding" sub="Manage new hires" color="teal" />
-          )}
-          <QuickAction href="/dashboard/directory" icon="👥" label="Directory" sub="Find colleagues" color="gray" />
-          {isRole("ADMIN") && (
-            <QuickAction href="/dashboard/users" icon="⚙️" label="Users" sub="Manage accounts" color="slate" />
-          )}
+        <h2 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-3">At a Glance</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+          {/* Card 1 — Today's attendance status */}
+          <div className="card p-5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-base">🕐</span>
+                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Today</span>
+              </div>
+              {todayAtt?.isWFH && (
+                <span className="text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-full">WFH</span>
+              )}
+            </div>
+
+            {todayAtt === undefined ? (
+              <div className="space-y-2 animate-pulse">
+                <div className="skeleton h-5 w-28 rounded" />
+                <div className="skeleton h-4 w-20 rounded" />
+              </div>
+            ) : todayAtt === null ? (
+              <>
+                <p className="text-sm font-bold text-gray-400">Not checked in</p>
+                <p className="text-xs text-gray-400 mt-1">You haven&apos;t checked in yet today</p>
+              </>
+            ) : (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
+                    todayAtt.status === "LATE" ? "bg-orange-100 text-orange-700" : "bg-green-100 text-green-700"
+                  }`}>{todayAtt.status}</span>
+                </div>
+                <div className="flex items-center gap-4 text-xs text-gray-500">
+                  <span>In {todayAtt.checkInTime ? fmtTime(todayAtt.checkInTime) : "—"}</span>
+                  {todayAtt.checkOutTime
+                    ? <span>Out {fmtTime(todayAtt.checkOutTime)}</span>
+                    : <span className="text-blue-500 font-semibold">{todayAtt.checkInTime ? elapsed(todayAtt.checkInTime) : "—"} elapsed</span>
+                  }
+                </div>
+                {(todayAtt.workHours != null || todayAtt.checkInTime) && (
+                  <div className="pt-1">
+                    <div className="text-lg font-black text-gray-800">
+                      {todayAtt.workHours != null
+                        ? `${todayAtt.workHours.toFixed(1)}h`
+                        : todayAtt.checkInTime ? elapsed(todayAtt.checkInTime) : "—"}
+                    </div>
+                    <div className="text-[11px] text-gray-400">
+                      {todayAtt.checkOutTime ? "total today" : "so far"}
+                      {todayAtt.overtimeHours && todayAtt.overtimeHours > 0
+                        ? ` · +${todayAtt.overtimeHours.toFixed(1)}h OT` : ""}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <Link href="/dashboard/attendance"
+              className="mt-4 flex items-center gap-1 text-xs font-semibold text-red-500 hover:text-red-600 transition-colors">
+              {todayAtt ? "View full attendance" : "Go check in"} →
+            </Link>
+          </div>
+
+          {/* Card 2 — Leave balance */}
+          <div className="card p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-base">🌿</span>
+              <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Leave Balance</span>
+            </div>
+
+            {loading ? (
+              <div className="space-y-2 animate-pulse">
+                {[1,2,3].map(i => <div key={i} className="skeleton h-4 w-full rounded" />)}
+              </div>
+            ) : balance.length === 0 ? (
+              <p className="text-sm text-gray-400">No leave types configured</p>
+            ) : (
+              <div className="space-y-2.5">
+                {balance.slice(0, 4).map((b) => {
+                  const pct = b.maxDays > 0 ? Math.round((b.remainingDays / b.maxDays) * 100) : 0;
+                  const barColor = pct > 50 ? "bg-green-400" : pct > 20 ? "bg-orange-400" : "bg-red-400";
+                  return (
+                    <div key={b.leaveType.id}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-gray-600 truncate max-w-[110px]">{b.leaveType.name}</span>
+                        <span className="text-xs font-bold text-gray-800">{b.remainingDays}<span className="font-normal text-gray-400">/{b.maxDays}</span></span>
+                      </div>
+                      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${pct}%` }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            <Link href="/dashboard/leaves"
+              className="mt-4 flex items-center gap-1 text-xs font-semibold text-red-500 hover:text-red-600 transition-colors">
+              Apply for leave →
+            </Link>
+          </div>
+
+          {/* Card 3 — Pending approvals (managers) or My leave status (employees) */}
+          <div className="card p-5">
+            {isRole("MANAGER", "HR", "ADMIN") ? (
+              <>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-base">⏳</span>
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Pending</span>
+                </div>
+                {loading ? (
+                  <div className="space-y-2 animate-pulse">
+                    <div className="skeleton h-8 w-16 rounded-lg" />
+                    <div className="skeleton h-4 w-28 rounded" />
+                  </div>
+                ) : (
+                  <>
+                    <div className="text-4xl font-black" style={{
+                      background: "linear-gradient(135deg, rgb(220,38,38), rgb(249,115,22))",
+                      WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                    }}>
+                      {isRole("MANAGER")
+                        ? (stats?.pendingApprovals ?? 0)
+                        : (stats?.pendingLeaves ?? 0)}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {(isRole("MANAGER") ? (stats?.pendingApprovals ?? 0) : (stats?.pendingLeaves ?? 0)) === 0
+                        ? "All caught up 🎉"
+                        : "leave requests need your review"}
+                    </p>
+                    {isRole("ADMIN", "HR") && stats?.presentToday != null && (
+                      <div className="mt-3 pt-3 border-t border-gray-50 flex gap-4 text-xs text-gray-500">
+                        <span><span className="font-bold text-gray-800">{stats.presentToday}</span> present</span>
+                        <span><span className="font-bold text-gray-800">{stats.onLeaveToday ?? 0}</span> on leave</span>
+                        <span><span className="font-bold text-gray-800">{stats.absentToday ?? 0}</span> absent</span>
+                      </div>
+                    )}
+                  </>
+                )}
+                <Link href="/dashboard/approvals"
+                  className="mt-4 flex items-center gap-1 text-xs font-semibold text-red-500 hover:text-red-600 transition-colors">
+                  Review requests →
+                </Link>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-base">📋</span>
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">My Leaves</span>
+                </div>
+                {loading ? (
+                  <div className="space-y-2 animate-pulse">
+                    <div className="skeleton h-8 w-16 rounded-lg" />
+                    <div className="skeleton h-4 w-28 rounded" />
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex gap-5">
+                      <div>
+                        <div className="text-3xl font-black text-gray-800">{stats?.leavesUsedThisYear ?? 0}</div>
+                        <div className="text-[11px] text-gray-400 mt-0.5">used this year</div>
+                      </div>
+                      {(stats?.pendingLeaves ?? 0) > 0 && (
+                        <div>
+                          <div className="text-3xl font-black text-orange-500">{stats?.pendingLeaves}</div>
+                          <div className="text-[11px] text-gray-400 mt-0.5">pending approval</div>
+                        </div>
+                      )}
+                    </div>
+                    {(stats?.pendingLeaves ?? 0) === 0 && (
+                      <p className="text-xs text-gray-400 mt-2">No pending requests</p>
+                    )}
+                  </>
+                )}
+                <Link href="/dashboard/leaves"
+                  className="mt-4 flex items-center gap-1 text-xs font-semibold text-red-500 hover:text-red-600 transition-colors">
+                  View leave history →
+                </Link>
+              </>
+            )}
+          </div>
+
         </div>
       </div>
 
@@ -246,35 +445,6 @@ function StatCard({ label, value, icon, variant, trend, urgent }: {
       <div className="text-xs font-semibold text-gray-700 mb-0.5">{label}</div>
       {trend && <div className={`text-xs ${v.sub} opacity-80`}>{trend}</div>}
     </div>
-  );
-}
-
-const QUICK_COLORS: Record<string, { bg: string; hover: string; icon: string; label: string }> = {
-  blue:   { bg: "bg-blue-50",   hover: "hover:bg-blue-100 hover:border-blue-200",   icon: "bg-blue-100",   label: "text-blue-700" },
-  green:  { bg: "bg-green-50",  hover: "hover:bg-green-100 hover:border-green-200", icon: "bg-green-100",  label: "text-green-700" },
-  orange: { bg: "bg-orange-50", hover: "hover:bg-orange-100 hover:border-orange-200",icon: "bg-orange-100",label: "text-orange-700" },
-  red:    { bg: "bg-red-50",    hover: "hover:bg-red-100 hover:border-red-200",     icon: "bg-red-100",    label: "text-red-700" },
-  purple: { bg: "bg-purple-50", hover: "hover:bg-purple-100 hover:border-purple-200",icon: "bg-purple-100",label: "text-purple-700" },
-  teal:   { bg: "bg-teal-50",   hover: "hover:bg-teal-100 hover:border-teal-200",   icon: "bg-teal-100",   label: "text-teal-700" },
-  gray:   { bg: "bg-gray-50",   hover: "hover:bg-gray-100 hover:border-gray-200",   icon: "bg-gray-100",   label: "text-gray-600" },
-  slate:  { bg: "bg-slate-50",  hover: "hover:bg-slate-100 hover:border-slate-200", icon: "bg-slate-100",  label: "text-slate-600" },
-};
-
-function QuickAction({ href, icon, label, sub, color }: { href: string; icon: string; label: string; sub: string; color: string }) {
-  const c = QUICK_COLORS[color] || QUICK_COLORS.gray;
-  return (
-    <Link
-      href={href}
-      className={`card card-interactive p-4 flex flex-col gap-2 group border ${c.bg} ${c.hover} transition-all`}
-    >
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl ${c.icon} transition-transform group-hover:scale-110`}>
-        {icon}
-      </div>
-      <div>
-        <div className={`text-sm font-bold ${c.label}`}>{label}</div>
-        <div className="text-xs text-gray-400 mt-0.5">{sub}</div>
-      </div>
-    </Link>
   );
 }
 
