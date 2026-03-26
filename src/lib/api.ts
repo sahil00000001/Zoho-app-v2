@@ -112,6 +112,10 @@ export const api = {
     request(`/api/leaves/${id}/reject`, { method: 'PATCH', body: JSON.stringify({ reason }) }),
   getLeaveBalance: () => request('/api/leaves/balance/me'),
   getLeaveTypes: () => request('/api/leave-types'),
+  getLeaveCalendar: (month?: string) => {
+    const qs = month ? `?month=${month}` : '';
+    return request<CalendarLeave[]>(`/api/leaves/calendar${qs}`);
+  },
 
   // Holidays
   getHolidays: (year?: number) => request(`/api/holidays${year ? `?year=${year}` : ''}`),
@@ -372,6 +376,23 @@ export interface AnnouncementData {
   departmentId?: string;
   expiresAt?: string;
   isPinned?: boolean;
+}
+
+export interface CalendarLeave {
+  id: string;
+  status: 'APPROVED' | 'PENDING';
+  startDate: string;
+  endDate: string;
+  reason: string;
+  leaveType: { id: string; name: string };
+  user: {
+    id: string;
+    employeeId: string;
+    firstName: string;
+    lastName: string;
+    designation?: string;
+    department?: { name: string };
+  };
 }
 
 export interface CertificationData {
