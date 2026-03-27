@@ -15,7 +15,11 @@ const PAGE_META: Record<string, { title: string; icon: string }> = {
   "/dashboard/employees":     { title: "Employees",     icon: "👥" },
 };
 
-export default function TopBar() {
+interface TopBarProps {
+  onMenuClick?: () => void;
+}
+
+export default function TopBar({ onMenuClick }: TopBarProps) {
   const path = usePathname();
   const router = useRouter();
   const { user, logout, isRole } = useAuth();
@@ -61,6 +65,17 @@ export default function TopBar() {
         scrolled ? "shadow-sm" : ""
       }`}
     >
+      {/* Hamburger — mobile only */}
+      <button
+        onClick={onMenuClick}
+        className="lg:hidden p-2 -ml-1 rounded-xl text-gray-500 hover:bg-gray-100 transition-colors shrink-0"
+        aria-label="Open menu"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
       {/* Page title */}
       <div className="flex items-center gap-3 flex-1 min-w-0">
         <div>

@@ -199,6 +199,15 @@ export default function AttendancePage() {
     finally { setActionLoading(false); }
   };
 
+  const handleReCheckIn = async () => {
+    setActionLoading(true); setError(''); setTodayErr('');
+    try {
+      const record = await api.reCheckIn();
+      setTodayRecord(record as AttendanceRecord);
+    } catch (err) { setError(err instanceof Error ? err.message : 'Failed to reopen session'); }
+    finally { setActionLoading(false); }
+  };
+
   // ── Regularization ────────────────────────────────────────────────────────
   const handleRegularize = async (e: React.FormEvent) => {
     e.preventDefault(); setRegLoading(true); setRegSuccess(''); setError('');
@@ -312,23 +321,23 @@ export default function AttendancePage() {
   const workPct = todayRecord?.workHours ? Math.min(100, (todayRecord.workHours / 8) * 100) : 0;
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 md:p-6 space-y-4 md:space-y-6">
       {/* ── Page Header ── */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-[22px] font-bold text-slate-900">Attendance</h1>
-          <p className="text-slate-500 text-sm mt-0.5">Track your check-ins, hours, and team presence</p>
+          <h1 className="text-xl md:text-[22px] font-bold text-slate-900">Attendance</h1>
+          <p className="text-slate-500 text-sm mt-0.5 hidden sm:block">Track your check-ins, hours, and team presence</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-2">
           {!isCheckedIn && (
             <button onClick={() => setIsWFH(v => !v)}
-              className={`px-4 py-2 border font-semibold rounded-lg text-sm transition-all active:scale-95 ${isWFH ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'}`}>
-              {isWFH ? '🏠 WFH Mode' : 'Mark WFH'}
+              className={`px-3 py-2 border font-semibold rounded-lg text-sm transition-all active:scale-95 ${isWFH ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'}`}>
+              {isWFH ? '🏠 WFH' : 'Mark WFH'}
             </button>
           )}
           {!isCheckedIn && (
             <button onClick={handleCheckIn} disabled={actionLoading}
-              className="px-6 py-2 text-white font-bold rounded-lg text-sm shadow-md shadow-orange-200 hover:opacity-90 transition-all active:scale-95 disabled:opacity-60 flex items-center gap-2"
+              className="px-5 py-2 text-white font-bold rounded-lg text-sm shadow-md shadow-orange-200 hover:opacity-90 transition-all active:scale-95 disabled:opacity-60 flex items-center gap-2"
               style={{ background: isWFH ? 'linear-gradient(135deg, #3b82f6, #2563eb)' : 'linear-gradient(135deg, #DC2626, #F97316)' }}>
               {actionLoading && <span className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />}
               {isWFH ? '🏠 Clock In (WFH)' : 'Clock In'}
@@ -339,6 +348,14 @@ export default function AttendancePage() {
               className="px-5 py-2 bg-red-50 text-red-600 font-bold rounded-lg text-sm hover:bg-red-100 transition-all active:scale-95 border border-red-100 flex items-center gap-2">
               {actionLoading && <span className="w-4 h-4 rounded-full border-2 border-red-300 border-t-red-600 animate-spin" />}
               Clock Out
+            </button>
+          )}
+          {isCheckedIn && isCheckedOut && (
+            <button onClick={handleReCheckIn} disabled={actionLoading}
+              title="Accidentally checked out? Resume your session — original check-in time is preserved"
+              className="px-4 py-2 bg-amber-50 text-amber-700 font-semibold rounded-lg text-sm hover:bg-amber-100 transition-all active:scale-95 border border-amber-200 flex items-center gap-2">
+              {actionLoading && <span className="w-4 h-4 rounded-full border-2 border-amber-400 border-t-amber-700 animate-spin" />}
+              ↩ Check In Again
             </button>
           )}
           <button onClick={() => fetchInitialData()} title="Refresh"
@@ -437,11 +454,11 @@ export default function AttendancePage() {
 
       {/* ── Tabs ── */}
       <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-        <div className="flex items-center justify-between px-4 pt-4 pb-0 border-b border-slate-100">
-          <div className="flex gap-1 bg-slate-50 p-1 rounded-xl mb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 pt-4 pb-0 border-b border-slate-100 gap-2">
+          <div className="flex gap-1 bg-slate-50 p-1 rounded-xl mb-1 sm:mb-3 overflow-x-auto">
             {tabs.map(t => (
               <button key={t.key} onClick={() => setActiveTab(t.key)}
-                className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${activeTab === t.key ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all whitespace-nowrap ${activeTab === t.key ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
                 {t.label}
               </button>
             ))}
@@ -449,10 +466,10 @@ export default function AttendancePage() {
 
           {/* Status filter (only on History tab) */}
           {activeTab === 'my' && (
-            <div className="flex gap-1 mb-3">
-              {['All', 'Present', 'Absent', 'WFH', 'Holiday'].map(f => (
+            <div className="flex gap-1 mb-2 sm:mb-3 overflow-x-auto pb-1">
+              {['All', 'Present', 'Absent', 'WFH'].map(f => (
                 <button key={f} onClick={() => setStatusFilter(f)}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${statusFilter === f ? 'bg-white text-slate-900 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-700'}`}>
+                  className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap ${statusFilter === f ? 'bg-white text-slate-900 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-700'}`}>
                   {f}
                 </button>
               ))}
@@ -461,7 +478,7 @@ export default function AttendancePage() {
 
           {/* Month nav (calendar tab) */}
           {activeTab === 'calendar' && (
-            <div className="flex items-center gap-2 mb-3 bg-slate-50 rounded-xl px-3 py-1.5 border border-slate-100">
+            <div className="flex items-center gap-2 mb-2 sm:mb-3 bg-slate-50 rounded-xl px-3 py-1.5 border border-slate-100">
               <button onClick={() => {
                 const [y, m] = currentMonth.split('-').map(Number);
                 const prev = new Date(y, m - 2, 1);

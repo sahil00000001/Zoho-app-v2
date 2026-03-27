@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const NAV_GROUPS = [
@@ -31,10 +31,20 @@ const ROLE_BADGES: Record<string, { label: string; color: string }> = {
   ADMIN:    { label: "Super Admin",color: "#ef4444" },
 };
 
-export default function Sidebar() {
+interface SidebarProps {
+  mobileOpen?: boolean;
+  onClose?: () => void;
+}
+
+export default function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
   const path = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const { user, canAccess, logout } = useAuth();
+
+  // Close mobile sidebar on navigation
+  useEffect(() => {
+    if (mobileOpen && onClose) onClose();
+  }, [path]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const initials = user ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase() : "U";
   const roleBadge = user ? ROLE_BADGES[user.role] : null;
@@ -44,9 +54,9 @@ export default function Sidebar() {
     return href === "/dashboard" ? path === href : path.startsWith(href);
   }
 
-  return (
+  const sidebarContent = (
     <aside
-      className={`${collapsed ? "w-[64px]" : "w-[240px]"} transition-all duration-300 ease-in-out flex flex-col bg-white shrink-0 min-h-screen sticky top-0 z-30`}
+      className={`${collapsed ? "w-[64px]" : "w-[240px]"} transition-all duration-300 ease-in-out flex flex-col bg-white h-full`}
       style={{ borderRight: "1px solid #f0f0f0", boxShadow: "1px 0 20px rgba(0,0,0,0.04)" }}
     >
       {/* Logo */}
@@ -63,6 +73,14 @@ export default function Sidebar() {
             <span className="font-black text-base tracking-tight gradient-text">Atlas</span>
             <div className="text-[10px] text-gray-400 font-medium -mt-0.5">HR Platform</div>
           </div>
+        )}
+        {/* Close button on mobile */}
+        {!collapsed && onClose && (
+          <button onClick={onClose} className="ml-auto p-1 rounded-lg text-gray-400 hover:text-gray-600 lg:hidden">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         )}
       </div>
 
@@ -182,10 +200,10 @@ export default function Sidebar() {
           {!collapsed && <span>Sign out</span>}
         </button>
 
-        {/* Collapse toggle */}
+        {/* Collapse toggle — desktop only */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="w-full flex items-center justify-center p-2 rounded-xl text-gray-300 hover:bg-gray-50 hover:text-gray-500 transition-colors"
+          className="hidden lg:flex w-full items-center justify-center p-2 rounded-xl text-gray-300 hover:bg-gray-50 hover:text-gray-500 transition-colors"
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           <svg
@@ -197,5 +215,29 @@ export default function Sidebar() {
         </button>
       </div>
     </aside>
+  );
+
+  return (
+    <>
+      {/* Desktop sidebar — always visible on lg+ */}
+      <div className="hidden lg:flex shrink-0 sticky top-0 h-screen">
+        {sidebarContent}
+      </div>
+
+      {/* Mobile drawer overlay */}
+      {mobileOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 flex">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={onClose}
+          />
+          {/* Drawer */}
+          <div className="relative z-10 flex h-full">
+            {sidebarContent}
+          </div>
+        </div>
+      )}
+    </>
   );
 }

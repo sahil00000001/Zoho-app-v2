@@ -137,6 +137,8 @@ export const api = {
     request('/api/attendance/check-in', { method: 'POST', body: JSON.stringify({ ...location, isWFH }) }),
   checkOut: (location?: { lat: number; lng: number; address?: string }) =>
     request('/api/attendance/check-out', { method: 'POST', body: JSON.stringify(location ?? {}) }),
+  reCheckIn: () =>
+    request('/api/attendance/re-check-in', { method: 'POST', body: JSON.stringify({}) }),
   getTodayAttendance: () => request('/api/attendance/today'),
   getAttendanceHistory: (limit?: number) =>
     request(`/api/attendance/history${limit ? `?limit=${limit}` : ''}`),
