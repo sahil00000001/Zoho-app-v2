@@ -14,20 +14,21 @@ function LoginForm() {
   const [resending, setResending] = useState(false);
   const [error, setError] = useState("");
 
-  // ── DEV ONLY: direct login bypass ─────────────────────────
-  const [devEmail, setDevEmail] = useState("");
+  // ── DEV ONLY — remove before go-live ─────────────────────
   const [devLoading, setDevLoading] = useState(false);
-  const [showDev, setShowDev] = useState(false);
 
-  const devLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const quickAccess = async () => {
     setDevLoading(true); setError("");
     try {
-      await api.sendOtp(devEmail);
-      setEmail(devEmail);
-      setStep("otp");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/api/auth/dev-login`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || "Dev login failed");
+      api.setTokens(data.data.accessToken, data.data.refreshToken);
+      router.push("/dashboard");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed");
+      setError(err instanceof Error ? err.message : "Quick access failed");
     } finally {
       setDevLoading(false);
     }
@@ -131,34 +132,15 @@ function LoginForm() {
       )}
 
       {/* ── DEV ONLY — remove before go-live ─────────────────── */}
-      <div className="mt-5">
-        <button
-          type="button"
-          onClick={() => setShowDev(v => !v)}
-          className="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-dashed border-amber-300 bg-amber-50 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-colors"
-        >
-          ⚠️ Dev Login {showDev ? "▲" : "▼"}
-        </button>
-        {showDev && (
-          <form onSubmit={devLogin} className="mt-2 flex gap-2">
-            <input
-              type="email"
-              required
-              placeholder="dev@email.com"
-              value={devEmail}
-              onChange={e => setDevEmail(e.target.value)}
-              className="flex-1 h-[38px] px-3 rounded-lg border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300 bg-amber-50"
-            />
-            <button
-              type="submit"
-              disabled={devLoading}
-              className="h-[38px] px-4 rounded-lg bg-amber-400 hover:bg-amber-500 text-white text-xs font-bold disabled:opacity-60 transition-colors"
-            >
-              {devLoading ? "…" : "Go"}
-            </button>
-          </form>
-        )}
-      </div>
+      <button
+        type="button"
+        onClick={quickAccess}
+        disabled={devLoading}
+        className="mt-5 w-full py-2 rounded-xl border border-dashed border-amber-300 bg-amber-50 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+      >
+        {devLoading ? <span className="w-3.5 h-3.5 rounded-full border-2 border-amber-400 border-t-transparent animate-spin" /> : "⚡"}
+        Quick Access
+      </button>
       {/* ── end DEV ONLY ─────────────────────────────────────── */}
 
       <div className="mt-6 text-center">
