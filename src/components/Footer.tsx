@@ -8,7 +8,6 @@ const QUICK_LINKS = [
   { href: "/dashboard/leaves",        label: "Leaves",        icon: "🌿" },
   { href: "/dashboard/approvals",     label: "Approvals",     icon: "✅" },
   { href: "/dashboard/announcements", label: "Announcements", icon: "📢" },
-  { href: "/dashboard/directory",     label: "Directory",     icon: "👥" },
   { href: "/dashboard/profile",       label: "My Profile",    icon: "👤" },
 ];
 
@@ -19,15 +18,6 @@ const ADMIN_LINKS = [
   { href: "/dashboard/users",      label: "User Management",    icon: "⚙️" },
   { href: "/dashboard/roles",      label: "Roles & Permissions",icon: "🔑" },
   { href: "/dashboard/audit",      label: "Audit Logs",         icon: "📋" },
-];
-
-const TECH_STACK = [
-  { label: "Next.js 16",   color: "bg-gray-100 text-gray-600" },
-  { label: "TypeScript",   color: "bg-blue-50 text-blue-600" },
-  { label: "Express.js",   color: "bg-green-50 text-green-700" },
-  { label: "PostgreSQL",   color: "bg-sky-50 text-sky-700" },
-  { label: "Prisma ORM",   color: "bg-purple-50 text-purple-700" },
-  { label: "Vercel",       color: "bg-gray-100 text-gray-700" },
 ];
 
 const year = new Date().getFullYear();
@@ -65,20 +55,6 @@ export default function Footer() {
               Smart HR &amp; workforce management for modern teams. Attendance, leaves, approvals &amp; more — all in one place.
             </p>
 
-            {/* Status */}
-            <div className="flex items-center gap-2 py-2 px-3 rounded-lg bg-green-50 border border-green-100 w-fit mb-5">
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse-soft shrink-0" />
-              <span className="text-[11px] font-semibold text-green-700">All systems operational</span>
-            </div>
-
-            {/* Tech stack */}
-            <div className="flex flex-wrap gap-1.5">
-              {TECH_STACK.map((t) => (
-                <span key={t.label} className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${t.color}`}>
-                  {t.label}
-                </span>
-              ))}
-            </div>
           </div>
 
           {/* ── Quick Links ── */}

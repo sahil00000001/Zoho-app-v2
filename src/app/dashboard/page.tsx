@@ -77,7 +77,7 @@ export default function DashboardPage() {
   });
 
   return (
-    <div className="space-y-6 animate-fade-in-up">
+    <div className="space-y-6 animate-fade-in">
       {/* ── Hero Header ── */}
       <div className="relative overflow-hidden rounded-2xl p-6 text-white" style={{ background: "linear-gradient(135deg, rgb(220,38,38) 0%, rgb(234,67,22) 50%, rgb(249,115,22) 100%)" }}>
         {/* Background decoration */}

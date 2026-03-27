@@ -135,7 +135,7 @@ export default function ApprovalsPage() {
   ];
 
   return (
-    <div className="space-y-5 animate-fade-in-up">
+    <div className="space-y-5 animate-fade-in">
 
       {/* ── Header ── */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
