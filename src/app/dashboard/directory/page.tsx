@@ -80,8 +80,8 @@ export default function DirectoryPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
         <div>
-          <h2 className="text-xl font-black text-gray-900">Employee Directory</h2>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-[22px] font-bold text-slate-900">Employee Directory</h1>
+          <p className="text-sm text-slate-500">
             {users.length} team member{users.length !== 1 ? "s" : ""} across{" "}
             {departments.length} department{departments.length !== 1 ? "s" : ""}
           </p>
@@ -99,7 +99,7 @@ export default function DirectoryPage() {
 
       {/* Filters */}
       <div className="flex flex-col md:flex-row gap-3 items-start md:items-center">
-        <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-2.5 border border-gray-200 flex-1 max-w-sm">
+        <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-2.5 border border-slate-200 flex-1 max-w-sm">
           <span className="text-gray-400 text-sm">🔍</span>
           <input
             value={search}
@@ -115,7 +115,7 @@ export default function DirectoryPage() {
               key={d}
               onClick={() => setDept(d)}
               className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
-                dept === d ? "text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-red-200"
+                dept === d ? "text-white" : "bg-white border border-slate-200 text-gray-600 hover:border-red-200"
               }`}
               style={dept === d ? { background: "linear-gradient(90deg, rgb(220,38,38), rgb(249,115,22))" } : {}}
             >
@@ -124,7 +124,7 @@ export default function DirectoryPage() {
           ))}
         </div>
 
-        <div className="flex gap-1 p-1 bg-gray-100 rounded-xl ml-auto">
+        <div className="flex gap-1 p-1 bg-slate-100 rounded-xl ml-auto">
           {(["grid", "list", "org"] as const).map((v) => (
             <button
               key={v}
@@ -142,7 +142,7 @@ export default function DirectoryPage() {
 
       {/* Empty state */}
       {filtered.length === 0 && (
-        <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
           <div className="text-4xl mb-3">👥</div>
           <p className="text-gray-500 font-medium">No employees found</p>
           <p className="text-gray-400 text-sm mt-1">Try adjusting your search or filter</p>
@@ -156,7 +156,7 @@ export default function DirectoryPage() {
             <div
               key={u.id}
               onClick={() => setSelected(u)}
-              className="glass-card rounded-2xl p-5 hover:shadow-xl transition-all duration-200 hover:-translate-y-1 cursor-pointer group border border-gray-100"
+              className="bg-white rounded-2xl p-5 hover:shadow-lg transition-all duration-200 hover:-translate-y-1 cursor-pointer group border border-slate-200"
             >
               <div className="flex flex-col items-center text-center">
                 <div
@@ -173,7 +173,7 @@ export default function DirectoryPage() {
                 >
                   {u.department?.name || "No Dept"}
                 </span>
-                <div className="mt-3 pt-3 border-t border-gray-100 w-full flex justify-between text-xs text-gray-400">
+                <div className="mt-3 pt-3 border-t border-slate-200 w-full flex justify-between text-xs text-gray-400">
                   <span>{u.employeeId}</span>
                   <span
                     className="font-semibold px-1.5 rounded"
@@ -193,10 +193,10 @@ export default function DirectoryPage() {
 
       {/* List view */}
       {view === "list" && filtered.length > 0 && (
-        <div className="glass-card rounded-2xl overflow-hidden border border-gray-100">
+        <div className="bg-white rounded-2xl overflow-hidden border border-slate-200">
           <table className="w-full">
             <thead>
-              <tr className="bg-gray-50/80">
+              <tr className="bg-slate-50/80">
                 {["Employee", "Department", "Role", "Designation", ""].map((h) => (
                   <th key={h} className="text-left px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wide">
                     {h}
@@ -208,7 +208,7 @@ export default function DirectoryPage() {
               {filtered.map((u) => (
                 <tr
                   key={u.id}
-                  className="border-t border-gray-50 hover:bg-gray-50/50 transition-colors cursor-pointer"
+                  className="border-t border-gray-50 hover:bg-slate-50/50 transition-colors cursor-pointer"
                   onClick={() => setSelected(u)}
                 >
                   <td className="px-5 py-3.5">
@@ -262,7 +262,7 @@ export default function DirectoryPage() {
 
       {/* Org chart — shows real manager/subordinate relationships */}
       {view === "org" && (
-        <div className="glass-card rounded-2xl p-8 border border-gray-100">
+        <div className="bg-white rounded-2xl p-8 border border-slate-200">
           <div className="flex flex-col items-center gap-2">
             {/* Top-level (no manager) */}
             {users
@@ -315,11 +315,11 @@ export default function DirectoryPage() {
             className="w-full max-w-md bg-white h-full overflow-y-auto shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between z-10">
+            <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between z-10">
               <h3 className="font-bold text-gray-900">Employee Profile</h3>
               <button
                 onClick={() => setSelected(null)}
-                className="text-gray-400 hover:text-gray-600 text-xl transition-colors w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100"
+                className="text-gray-400 hover:text-gray-600 text-xl transition-colors w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100"
               >
                 ×
               </button>
@@ -327,14 +327,14 @@ export default function DirectoryPage() {
 
             <div className="p-6">
               {/* Header */}
-              <div className="flex flex-col items-center text-center pb-6 border-b border-gray-100">
+              <div className="flex flex-col items-center text-center pb-6 border-b border-slate-200">
                 <div
                   className="w-20 h-20 rounded-2xl flex items-center justify-center text-white text-2xl font-black mb-4"
                   style={{ background: "linear-gradient(135deg, rgb(220,38,38), rgb(249,115,22))" }}
                 >
                   {getInitials(selected.firstName, selected.lastName)}
                 </div>
-                <h2 className="text-xl font-black text-gray-900">{selected.firstName} {selected.lastName}</h2>
+                <h2 className="text-xl font-bold text-slate-900">{selected.firstName} {selected.lastName}</h2>
                 <p className="text-gray-500 text-sm mt-1">{selected.designation || "—"}</p>
                 <div className="flex items-center gap-2 mt-2">
                   <span
@@ -391,7 +391,7 @@ export default function DirectoryPage() {
                 ))}
               </div>
 
-              <div className="flex gap-3 pt-4 border-t border-gray-100">
+              <div className="flex gap-3 pt-4 border-t border-slate-200">
                 <a
                   href={`mailto:${selected.email}`}
                   className="flex-1 py-2.5 text-sm font-bold text-white rounded-xl text-center transition-all hover:opacity-90"
@@ -402,7 +402,7 @@ export default function DirectoryPage() {
                 {isRole("ADMIN") && (
                   <a
                     href="/dashboard/users"
-                    className="flex-1 py-2.5 text-sm font-semibold rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors text-center"
+                    className="flex-1 py-2.5 text-sm font-semibold rounded-xl border border-slate-200 text-gray-600 hover:bg-slate-50 transition-colors text-center"
                   >
                     Edit Profile
                   </a>
@@ -428,7 +428,7 @@ function OrgNode({
 }) {
   return (
     <div
-      className={`flex flex-col items-center glass-card rounded-xl p-3 border border-gray-100 hover:shadow-md transition-all cursor-pointer ${small ? "w-32" : "w-40"}`}
+      className={`flex flex-col items-center bg-white border border-slate-200 rounded-xl p-3 hover:shadow-md transition-all cursor-pointer ${small ? "w-32" : "w-40"}`}
       onClick={onClick}
     >
       <div

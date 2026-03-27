@@ -5,7 +5,29 @@
       "Bash(curl -s -X POST https://zoho-backend-rho.vercel.app/api/auth/login -H \"Content-Type: application/json\" -d '{\"\"\"\"email\"\"\"\":\"\"\"\"vashishtsahil9999@gmail.com\"\"\"\"}')",
       "Bash(curl -s https://zoho-backend-rho.vercel.app/api/users -H \"Authorization: Bearer invalid_token\")",
       "Bash(node -e \"const { PrismaClient } = require\\(''@prisma/client''\\); const p = new PrismaClient\\(\\); console.log\\(Object.keys\\(p\\).filter\\(k => k.toLowerCase\\(\\).includes\\(''kra''\\)\\)\\);\")",
-      "Bash(xargs head:*)"
+      "Bash(xargs head:*)",
+      "Bash(grep -r project c:/Users/vashi/Downloads/backend/zoho-backend/src/routes/ --include=*.ts -l)",
+      "Bash(find c:/Users/vashi/Downloads/backend/zoho-backend/src -name prisma*)",
+      "Bash(ls -lh c:UsersvashiDownloadsbackendZoho-app-v2srcappdashboard*.tsx)",
+      "Read(//c/Users/vashi/Downloads/backend/Zoho-app-v2/**)",
+      "Bash(xargs wc:*)",
+      "WebSearch",
+      "WebFetch(domain:developers.googleblog.com)",
+      "WebFetch(domain:github.com)",
+      "Read(//c/Users/vashi/.claude/**)",
+      "Bash(npm show:*)",
+      "Bash(node -e \"import\\(''@google/stitch-sdk''\\).then\\(m => console.log\\(Object.keys\\(m\\)\\)\\).catch\\(e => console.log\\(e.message\\)\\)\")",
+      "Bash(timeout 4 node stitch-mcp-server.mjs)",
+      "Bash(STITCH_API_KEY=\"AQ.Ab8RN6LIhmANy-xKvBtTFbapVfnHvV3_G06IL6LlFm3wL0JdFw\" timeout 4 node stitch-mcp-server.mjs)",
+      "Bash(node stitch-generate.mjs)",
+      "Bash(node stitch-retry.mjs)",
+      "Bash(wc -l \"c:/Users/vashi/Downloads/backend/Zoho-app-v2/stitch-screens/\"*.html)",
+      "Bash(sed -i 's/border-gray-100/border-slate-200/g; s/border-gray-200/border-slate-200/g; s/bg-gray-100/bg-slate-100/g; s/font-black/font-bold/g' \"c:/Users/vashi/Downloads/backend/Zoho-app-v2/src/app/dashboard/audit/page.tsx\")",
+      "Bash(sed -i 's/border-gray-100/border-slate-200/g; s/border-gray-200/border-slate-200/g; s/bg-gray-100/bg-slate-100/g; s/font-black/font-bold/g' \"c:/Users/vashi/Downloads/backend/Zoho-app-v2/src/app/dashboard/profile/page.tsx\")",
+      "Bash(sed -i 's/border-gray-100/border-slate-200/g; s/border-gray-200/border-slate-200/g; s/bg-gray-100/bg-slate-100/g; s/font-black/font-bold/g' \"c:/Users/vashi/Downloads/backend/Zoho-app-v2/src/app/dashboard/leaves/page.tsx\")",
+      "Bash(for f:*)",
+      "Bash(do sed:*)",
+      "Bash(done)"
     ]
   }
 }

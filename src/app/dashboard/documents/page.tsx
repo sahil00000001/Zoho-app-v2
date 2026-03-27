@@ -72,7 +72,7 @@ export default function DocumentsPage() {
       {/* Header + upload */}
       <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
         <div>
-          <h2 className="text-xl font-black text-gray-900">Organization Documents</h2>
+          <h2 className="text-xl font-bold text-slate-900">Organization Documents</h2>
           <p className="text-sm text-gray-500">{docs.length} documents · Always version-controlled</p>
         </div>
         <div className="flex gap-3">
@@ -94,7 +94,7 @@ export default function DocumentsPage() {
                 style={category === c.key ? { background: "linear-gradient(90deg, rgb(220,38,38), rgb(249,115,22))" } : {}}>
                 <span>{c.icon}</span>
                 <span className="flex-1">{c.label}</span>
-                <span className={`text-xs px-1.5 py-0.5 rounded-full ${category === c.key ? "bg-white/20 text-white" : "bg-gray-100 text-gray-500"}`}>{count}</span>
+                <span className={`text-xs px-1.5 py-0.5 rounded-full ${category === c.key ? "bg-white/20 text-white" : "bg-slate-100 text-gray-500"}`}>{count}</span>
               </button>
             );
           })}
@@ -104,11 +104,11 @@ export default function DocumentsPage() {
         <div className="flex-1 min-w-0 space-y-5">
           {/* Search + view toggle */}
           <div className="flex gap-3 items-center">
-            <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-2.5 border border-gray-200 flex-1">
-              <span className="text-gray-400">🔍</span>
+            <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-2.5 border border-slate-200 flex-1">
+              <span className="text-slate-400">🔍</span>
               <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search documents..." className="bg-transparent text-sm text-gray-700 placeholder-gray-400 focus:outline-none flex-1" />
             </div>
-            <div className="flex gap-1 p-1 bg-gray-100 rounded-xl">
+            <div className="flex gap-1 p-1 bg-slate-100 rounded-xl">
               {(["grid", "list"] as const).map((v) => (
                 <button key={v} onClick={() => setView(v)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${view === v ? "text-white shadow-sm" : "text-gray-500"}`}
@@ -124,7 +124,7 @@ export default function DocumentsPage() {
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-sm font-bold text-gray-700">📌 Pinned</span>
-                <div className="h-0.5 flex-1 bg-gray-100 rounded" />
+                <div className="h-0.5 flex-1 bg-slate-100 rounded" />
               </div>
               <div className={view === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-2"}>
                 {pinned.map(d => <DocCard key={d.id} doc={d} view={view} onClick={() => setSelected(d)} />)}
@@ -138,7 +138,7 @@ export default function DocumentsPage() {
               {pinned.length > 0 && (
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-sm font-bold text-gray-700">All</span>
-                  <div className="h-0.5 flex-1 bg-gray-100 rounded" />
+                  <div className="h-0.5 flex-1 bg-slate-100 rounded" />
                 </div>
               )}
               <div className={view === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-2"}>
@@ -151,7 +151,7 @@ export default function DocumentsPage() {
             <div className="text-center py-16">
               <div className="text-5xl mb-4">📂</div>
               <h3 className="font-bold text-gray-700 text-lg mb-1">No documents found</h3>
-              <p className="text-gray-400 text-sm">Try a different search or upload a new document.</p>
+              <p className="text-slate-400 text-sm">Try a different search or upload a new document.</p>
             </div>
           )}
         </div>
@@ -161,9 +161,9 @@ export default function DocumentsPage() {
       {selected && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex justify-end">
           <div className="w-full max-w-md bg-white h-full overflow-y-auto shadow-2xl">
-            <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between z-10">
-              <h3 className="font-bold text-gray-900">Document Details</h3>
-              <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-600 text-xl w-8 h-8 flex items-center justify-center">×</button>
+            <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between z-10">
+              <h3 className="font-bold text-slate-900">Document Details</h3>
+              <button onClick={() => setSelected(null)} className="text-slate-400 hover:text-gray-600 text-xl w-8 h-8 flex items-center justify-center">×</button>
             </div>
             <div className="p-6">
               {/* Preview area */}
@@ -174,7 +174,7 @@ export default function DocumentsPage() {
                 </div>
               </div>
 
-              <h2 className="text-lg font-black text-gray-900 mb-1">{selected.name}</h2>
+              <h2 className="text-lg font-bold text-slate-900 mb-1">{selected.name}</h2>
 
               <div className="flex flex-wrap gap-1.5 mb-5">
                 {selected.tags.map(t => (
@@ -191,7 +191,7 @@ export default function DocumentsPage() {
                   { label: "Updated by", value: selected.updatedBy },
                 ].map(d => (
                   <div key={d.label} className="flex justify-between items-center py-2 border-b border-gray-50">
-                    <span className="text-xs text-gray-400 font-medium">{d.label}</span>
+                    <span className="text-xs text-slate-400 font-medium">{d.label}</span>
                     <span className="text-sm font-semibold text-gray-700">{d.value}</span>
                   </div>
                 ))}
@@ -201,7 +201,7 @@ export default function DocumentsPage() {
                 <button className="py-3 text-white font-bold rounded-xl text-sm flex items-center justify-center gap-1.5" style={{ background: "linear-gradient(90deg, rgb(220,38,38), rgb(249,115,22))" }}>
                   ⬇ Download
                 </button>
-                <button className="py-3 font-semibold rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors text-sm">
+                <button className="py-3 font-semibold rounded-xl border border-slate-200 text-gray-600 hover:bg-gray-50 transition-colors text-sm">
                   Share
                 </button>
               </div>
@@ -218,14 +218,14 @@ function DocCard({ doc, view, onClick }: { doc: Doc; view: "grid" | "list"; onCl
 
   if (view === "list") {
     return (
-      <div onClick={onClick} className="glass-card rounded-xl px-5 py-3.5 flex items-center gap-4 hover:shadow-md transition-all cursor-pointer group border border-gray-100 hover:-translate-y-0.5">
+      <div onClick={onClick} className="bg-white border border-slate-200 rounded-xl px-5 py-3.5 flex items-center gap-4 hover:shadow-md transition-all cursor-pointer group border border-slate-200 hover:-translate-y-0.5">
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 ${tc.bg}`}>{tc.icon}</div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h4 className="font-semibold text-gray-900 text-sm truncate">{doc.name}</h4>
+            <h4 className="font-semibold text-slate-900 text-sm truncate">{doc.name}</h4>
             {doc.pinned && <span className="text-xs">📌</span>}
           </div>
-          <div className="text-xs text-gray-400 mt-0.5">{doc.updatedAt} · {doc.size} · {doc.version}</div>
+          <div className="text-xs text-slate-400 mt-0.5">{doc.updatedAt} · {doc.size} · {doc.version}</div>
         </div>
         <span className={`text-xs font-bold px-2 py-0.5 rounded-full uppercase ${tc.bg}`} style={{ color: tc.color }}>{doc.type}</span>
         <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -236,7 +236,7 @@ function DocCard({ doc, view, onClick }: { doc: Doc; view: "grid" | "list"; onCl
   }
 
   return (
-    <div onClick={onClick} className="glass-card rounded-2xl p-5 hover:shadow-xl transition-all duration-200 hover:-translate-y-1 cursor-pointer group border border-gray-100">
+    <div onClick={onClick} className="bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-xl transition-all duration-200 hover:-translate-y-1 cursor-pointer group border border-slate-200">
       <div className="flex items-start justify-between mb-4">
         <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${tc.bg}`}>{tc.icon}</div>
         <div className="flex items-center gap-1.5">
@@ -244,13 +244,13 @@ function DocCard({ doc, view, onClick }: { doc: Doc; view: "grid" | "list"; onCl
           <span className={`text-xs font-bold px-2 py-0.5 rounded-full uppercase ${tc.bg}`} style={{ color: tc.color }}>{doc.type}</span>
         </div>
       </div>
-      <h4 className="font-bold text-gray-900 text-sm mb-1 group-hover:gradient-text transition-all line-clamp-2">{doc.name}</h4>
+      <h4 className="font-bold text-slate-900 text-sm mb-1 group-hover:gradient-text transition-all line-clamp-2">{doc.name}</h4>
       <div className="flex flex-wrap gap-1 mb-3">
         {doc.tags.slice(0, 2).map(t => (
           <span key={t} className="text-xs px-1.5 py-0.5 rounded" style={{ background: "rgba(220,38,38,0.06)", color: "rgb(220,38,38)" }}>#{t}</span>
         ))}
       </div>
-      <div className="text-xs text-gray-400 flex justify-between items-center pt-3 border-t border-gray-100">
+      <div className="text-xs text-slate-400 flex justify-between items-center pt-3 border-t border-slate-200">
         <span>{doc.size} · {doc.version}</span>
         <span>{doc.updatedAt}</span>
       </div>

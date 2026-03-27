@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
@@ -8,144 +7,102 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 function LoginForm() {
   const router = useRouter();
   const { login } = useAuth();
-  const [step, setStep] = useState<'email' | 'otp'>('email');
-  const [email, setEmail] = useState('');
-  const [otp, setOtp] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [step, setStep] = useState<"email" | "otp">("email");
+  const [email, setEmail] = useState("");
+  const [otp, setOtp]   = useState("");
+  const [loading, setLoading]   = useState(false);
   const [resending, setResending] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleEmailSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      await api.sendOtp(email);
-      setStep('otp');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send OTP');
-    } finally {
-      setLoading(false);
-    }
+  const sendOtp = async (e: React.FormEvent) => {
+    e.preventDefault(); setError(""); setLoading(true);
+    try { await api.sendOtp(email); setStep("otp"); }
+    catch (err) { setError(err instanceof Error ? err.message : "Failed to send code"); }
+    finally { setLoading(false); }
   };
 
-  const handleOtpSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      await login(email, otp);
-      router.push('/dashboard');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Invalid OTP');
-    } finally {
-      setLoading(false);
-    }
+  const verifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault(); setError(""); setLoading(true);
+    try { await login(email, otp); router.push("/dashboard"); }
+    catch (err) { setError(err instanceof Error ? err.message : "Invalid code"); }
+    finally { setLoading(false); }
   };
 
-  const handleResend = async () => {
-    setResending(true);
-    setError('');
-    try {
-      await api.sendOtp(email);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to resend OTP');
-    } finally {
-      setResending(false);
-    }
+  const resend = async () => {
+    setResending(true); setError("");
+    try { await api.sendOtp(email); }
+    catch (err) { setError(err instanceof Error ? err.message : "Failed to resend"); }
+    finally { setResending(false); }
   };
 
-  const inputClass = "w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all";
+  const inputCls = "w-full h-[44px] px-4 rounded-[10px] border border-slate-200 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none transition-all text-sm text-slate-900 placeholder:text-slate-400";
 
   return (
-    <div className="max-w-md w-full mx-auto lg:mx-0">
-      {step === 'email' ? (
+    <div className="w-full max-w-[380px] flex flex-col">
+      {step === "email" ? (
         <>
-          <h1 className="text-3xl font-black text-gray-900 mb-2">Welcome back</h1>
-          <p className="text-gray-500 mb-8">Enter your work email to receive a sign-in code</p>
-
-          <form onSubmit={handleEmailSubmit} className="space-y-5">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Work email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@company.com"
-                required
-                className={inputClass}
-                autoFocus
-              />
+          <div className="mb-6">
+            <h2 className="text-[26px] font-bold text-slate-900 mb-1">Welcome back</h2>
+            <p className="text-slate-500 text-sm">Enter your work email to receive a sign-in code</p>
+          </div>
+          <form onSubmit={sendOtp} className="flex flex-col gap-5">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider" htmlFor="email">
+                Email address
+              </label>
+              <input id="email" type="email" required value={email} onChange={e => setEmail(e.target.value)}
+                placeholder="name@company.com" className={inputCls} autoFocus />
             </div>
-
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl">
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full text-white font-bold py-3.5 rounded-xl text-sm transition-all disabled:opacity-70 flex items-center justify-center gap-2"
-              style={{ background: "linear-gradient(90deg, rgb(220,38,38), rgb(249,115,22))", boxShadow: loading ? "none" : "0 8px 24px rgba(220,38,38,0.25)" }}
-            >
-              {loading ? (
-                <><span className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />Sending code...</>
-              ) : "Send sign-in code →"}
-            </button>
+            {error && <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl">{error}</div>}
+            <div className="pt-1">
+              <button type="submit" disabled={loading}
+                className="w-full h-[44px] text-white font-bold rounded-[12px] flex items-center justify-center gap-2 transition-all disabled:opacity-60"
+                style={{ background: "linear-gradient(135deg, #DC2626 0%, #F97316 100%)", boxShadow: "0 4px 14px rgba(220,38,38,0.30)" }}>
+                {loading
+                  ? <><span className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />Sending code…</>
+                  : "Send sign-in code →"}
+              </button>
+            </div>
           </form>
         </>
       ) : (
         <>
-          <button onClick={() => { setStep('email'); setOtp(''); setError(''); }} className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-6 transition-colors">
+          <button onClick={() => { setStep("email"); setOtp(""); setError(""); }}
+            className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-5 transition-colors">
             ← Back
           </button>
-          <h1 className="text-3xl font-black text-gray-900 mb-2">Check your email</h1>
-          <p className="text-gray-500 mb-2">We sent a 6-digit code to</p>
-          <p className="font-semibold text-gray-800 mb-3">{email}</p>
-          <p className="text-xs text-gray-400 mb-6">Can&apos;t find it? Check your spam/junk folder. The code expires in 10 minutes.</p>
-
-          <form onSubmit={handleOtpSubmit} className="space-y-5">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Sign-in code</label>
-              <input
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]{6}"
-                maxLength={6}
-                value={otp}
-                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+          <div className="mb-6">
+            <h2 className="text-[26px] font-bold text-slate-900 mb-1">Check your email</h2>
+            <p className="text-slate-500 text-sm">We sent a 6-digit code to</p>
+            <p className="font-semibold text-slate-800 text-sm mt-0.5">{email}</p>
+          </div>
+          <form onSubmit={verifyOtp} className="flex flex-col gap-5">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider" htmlFor="otp">
+                Sign-in code
+              </label>
+              <input id="otp" type="text" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} required
+                value={otp} onChange={e => setOtp(e.target.value.replace(/\D/g, ""))}
                 placeholder="000000"
-                required
-                className={`${inputClass} text-center text-2xl font-mono tracking-[0.5em]`}
-                autoFocus
-              />
-              <p className="text-xs text-gray-400 mt-1.5 text-center">Code expires in 10 minutes</p>
+                className={`${inputCls} text-center text-2xl font-mono tracking-[0.4em]`} autoFocus />
+              <p className="text-xs text-slate-400 text-center">Code expires in 10 minutes</p>
             </div>
-
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl">
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading || otp.length !== 6}
-              className="w-full text-white font-bold py-3.5 rounded-xl text-sm transition-all disabled:opacity-70 flex items-center justify-center gap-2"
-              style={{ background: "linear-gradient(90deg, rgb(220,38,38), rgb(249,115,22))", boxShadow: loading ? "none" : "0 8px 24px rgba(220,38,38,0.25)" }}
-            >
-              {loading ? (
-                <><span className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />Verifying...</>
-              ) : "Sign in →"}
-            </button>
-
+            {error && <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl">{error}</div>}
+            <div className="pt-1">
+              <button type="submit" disabled={loading || otp.length !== 6}
+                className="w-full h-[44px] text-white font-bold rounded-[12px] flex items-center justify-center gap-2 transition-all disabled:opacity-60"
+                style={{ background: "linear-gradient(135deg, #DC2626 0%, #F97316 100%)", boxShadow: "0 4px 14px rgba(220,38,38,0.30)" }}>
+                {loading
+                  ? <><span className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />Verifying…</>
+                  : "Sign in →"}
+              </button>
+            </div>
             <div className="text-center">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-slate-500">
                 Didn&apos;t receive it?{" "}
-                <button type="button" onClick={handleResend} disabled={resending} className="font-bold transition-colors" style={{ color: "rgb(220,38,38)" }}>
-                  {resending ? "Sending..." : "Resend code"}
+                <button type="button" onClick={resend} disabled={resending}
+                  className="font-bold text-red-600 hover:text-red-700 transition-colors">
+                  {resending ? "Sending…" : "Resend code"}
                 </button>
               </p>
             </div>
@@ -154,17 +111,15 @@ function LoginForm() {
       )}
 
       <div className="mt-6 text-center">
-        <p className="text-sm text-gray-500">
+        <p className="text-[12px] text-slate-500">
           Don&apos;t have an account?{" "}
-          <Link href="/signup" className="font-bold" style={{ color: "rgb(220,38,38)" }}>Contact your admin</Link>
+          <span className="font-semibold text-slate-700">Contact your HR admin</span>
         </p>
       </div>
 
-      <div className="mt-8 pt-6 border-t border-gray-100">
-        <div className="flex items-center gap-3 text-xs text-gray-400">
-          <span>🔒</span>
-          <span>256-bit encrypted · SOC 2 compliant · GDPR ready</span>
-        </div>
+      <div className="mt-6 pt-5 border-t border-slate-100 flex items-center gap-2 text-xs text-slate-400">
+        <span>🔒</span>
+        <span>256-bit encrypted · SOC 2 compliant · GDPR ready</span>
       </div>
     </div>
   );
@@ -173,59 +128,58 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <AuthProvider>
-      <div className="min-h-screen bg-white flex">
+      <div className="h-screen flex overflow-hidden font-sans">
         {/* Left panel */}
-        <div
-          className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 relative overflow-hidden"
-          style={{ background: "linear-gradient(135deg, rgb(220,38,38) 0%, rgb(249,115,22) 100%)" }}
-        >
-          <div className="absolute inset-0 opacity-10">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="absolute rounded-full border-2 border-white" style={{ width: `${(i+1)*120}px`, height: `${(i+1)*120}px`, top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
-            ))}
-          </div>
-          <div className="relative z-10">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
-                <span className="text-white font-black text-base">A</span>
+        <section className="hidden lg:flex lg:w-[45%] relative flex-col items-center justify-center p-12 text-white"
+          style={{ background: "linear-gradient(135deg, #DC2626 0%, #F97316 100%)" }}>
+          {/* Grid overlay */}
+          <div className="absolute inset-0 opacity-30"
+            style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.15) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
+          <div className="relative z-10 flex flex-col items-center text-center max-w-sm">
+            {/* Logo */}
+            <div className="w-16 h-16 rounded-xl border-2 border-white/30 flex items-center justify-center mb-6 bg-white/10 backdrop-blur-sm">
+              <span className="text-3xl font-black text-white">A</span>
+            </div>
+            <h1 className="text-[28px] font-bold tracking-tight mb-1">Atlas HR</h1>
+            <p className="text-white/80 text-sm font-medium mb-12">Workforce Platform</p>
+            {/* Features */}
+            <ul className="space-y-5 text-left w-full px-4">
+              {["Smart attendance tracking", "Leave & approvals workflow", "Team analytics & insights"].map(f => (
+                <li key={f} className="flex items-center gap-4">
+                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
+                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span className="text-[15px] font-medium">{f}</span>
+                </li>
+              ))}
+            </ul>
+            {/* Social proof */}
+            <div className="mt-12 flex items-center gap-3">
+              <div className="flex -space-x-2">
+                {["SC","MW","PN","AK"].map((a,i) => (
+                  <div key={i} className="w-8 h-8 rounded-full bg-white/30 border-2 border-white flex items-center justify-center text-white text-[10px] font-bold">{a}</div>
+                ))}
               </div>
-              <span className="text-white font-black text-xl">Atlas</span>
-            </Link>
-          </div>
-          <div className="relative z-10">
-            <h2 className="text-4xl font-black text-white mb-4 leading-tight">Your team&apos;s HR,<br />simplified.</h2>
-            <p className="text-white/75 text-lg leading-relaxed mb-10">Manage attendance, leaves, approvals, and docs — all in one place.</p>
-            <div className="space-y-4">
-              {["One-click attendance tracking", "Smart leave management", "Instant approval workflows"].map((t) => (
-                <div key={t} className="flex items-center gap-3">
-                  <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-white text-xs font-bold shrink-0">✓</div>
-                  <span className="text-white/85 text-sm font-medium">{t}</span>
-                </div>
-              ))}
+              <p className="text-white/70 text-sm">Trusted by modern teams</p>
             </div>
           </div>
-          <div className="relative z-10 flex items-center gap-3">
-            <div className="flex -space-x-2">
-              {["SC","MW","PN","AK"].map((a, i) => (
-                <div key={i} className="w-8 h-8 rounded-full bg-white/30 border-2 border-white flex items-center justify-center text-white text-xs font-bold">{a}</div>
-              ))}
-            </div>
-            <p className="text-white/70 text-sm">Trusted by 12,000+ employees</p>
-          </div>
-        </div>
+        </section>
 
         {/* Right panel */}
-        <div className="flex-1 flex flex-col justify-center px-6 lg:px-16 xl:px-24">
-          <div className="lg:hidden mb-8">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg, rgb(220,38,38), rgb(249,115,22))" }}>
-                <span className="text-white font-black text-sm">P</span>
-              </div>
-              <span className="font-black text-xl text-gray-900">Atlas</span>
-            </Link>
+        <section className="w-full lg:w-[55%] flex flex-col items-center justify-center p-8 relative bg-white">
+          {/* Mobile logo */}
+          <div className="lg:hidden mb-8 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-black text-base"
+              style={{ background: "linear-gradient(135deg, #DC2626, #F97316)" }}>A</div>
+            <span className="font-black text-xl text-slate-900">Atlas HR</span>
           </div>
           <LoginForm />
-        </div>
+          <p className="absolute bottom-6 text-[11px] text-slate-400 tracking-wide font-medium">
+            Atlas HR · Secured · v2.0
+          </p>
+        </section>
       </div>
     </AuthProvider>
   );

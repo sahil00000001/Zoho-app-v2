@@ -85,16 +85,16 @@ export default function UsersPage() {
     ADMIN: 'bg-red-100 text-red-700',
   };
 
-  const inputClass = "w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all";
+  const inputClass = "w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all";
 
   if (authLoading) return null;
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-black text-gray-900">User Management</h2>
-          <p className="text-sm text-gray-500 mt-0.5">{users.length} users</p>
+          <h1 className="text-[22px] font-bold text-slate-900">User Management</h1>
+          <p className="text-sm text-slate-500 mt-0.5">{users.length} users</p>
         </div>
         <button
           onClick={() => setShowCreate(true)}
@@ -106,25 +106,31 @@ export default function UsersPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-3 flex-wrap">
+      <div className="flex flex-wrap items-center gap-3">
         <input
           type="text"
           placeholder="Search name, email, ID..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 w-64 transition-all"
+          className="px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 w-64 transition-all"
         />
-        <select
-          value={roleFilter}
-          onChange={(e) => setRoleFilter(e.target.value)}
-          className="px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all"
-        >
-          <option value="">All Roles</option>
-          <option value="EMPLOYEE">Employee</option>
-          <option value="MANAGER">Manager</option>
-          <option value="HR">HR</option>
-          <option value="ADMIN">Admin</option>
-        </select>
+        <div className="flex gap-1 bg-slate-100 p-1 rounded-xl">
+          {[
+            { value: "", label: "All" },
+            { value: "ADMIN", label: "Admin" },
+            { value: "HR", label: "HR" },
+            { value: "MANAGER", label: "Manager" },
+            { value: "EMPLOYEE", label: "Employee" },
+          ].map(r => (
+            <button
+              key={r.value}
+              onClick={() => setRoleFilter(r.value)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${roleFilter === r.value ? "bg-white shadow-sm text-slate-900" : "text-slate-500 hover:text-slate-700"}`}
+            >
+              {r.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {fetchError && (
@@ -140,16 +146,16 @@ export default function UsersPage() {
           <div className="w-8 h-8 rounded-full border-2 border-red-500/20 border-t-red-500 animate-spin" />
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-100">
-                  <th className="text-left text-xs font-semibold text-gray-500 px-5 py-3">Employee</th>
-                  <th className="text-left text-xs font-semibold text-gray-500 px-5 py-3">Role</th>
-                  <th className="text-left text-xs font-semibold text-gray-500 px-5 py-3 hidden md:table-cell">Department</th>
-                  <th className="text-left text-xs font-semibold text-gray-500 px-5 py-3 hidden lg:table-cell">Designation</th>
-                  <th className="text-left text-xs font-semibold text-gray-500 px-5 py-3">Status</th>
+                <tr className="border-b border-slate-100">
+                  <th className="text-left text-xs font-bold text-slate-400 uppercase tracking-wider px-5 py-3.5">Employee</th>
+                  <th className="text-left text-xs font-bold text-slate-400 uppercase tracking-wider px-5 py-3.5">Role</th>
+                  <th className="text-left text-xs font-bold text-slate-400 uppercase tracking-wider px-5 py-3.5 hidden md:table-cell">Department</th>
+                  <th className="text-left text-xs font-bold text-slate-400 uppercase tracking-wider px-5 py-3.5 hidden lg:table-cell">Designation</th>
+                  <th className="text-left text-xs font-bold text-slate-400 uppercase tracking-wider px-5 py-3.5">Status</th>
                   <th className="px-5 py-3" />
                 </tr>
               </thead>
@@ -158,7 +164,7 @@ export default function UsersPage() {
                   <tr><td colSpan={6} className="text-center py-10 text-sm text-gray-400">No users found</td></tr>
                 )}
                 {users.map((user) => (
-                  <tr key={user.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
+                  <tr key={user.id} className="border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors">
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0" style={{ background: "linear-gradient(135deg, rgb(220,38,38), rgb(249,115,22))" }}>
@@ -180,7 +186,7 @@ export default function UsersPage() {
                       <span className="text-sm text-gray-600">{user.designation || '—'}</span>
                     </td>
                     <td className="px-5 py-3.5">
-                      <span className={`text-xs font-semibold px-2 py-1 rounded-full ${user.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                      <span className={`text-xs font-semibold px-2 py-1 rounded-full ${user.isActive ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-gray-500'}`}>
                         {user.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </td>
@@ -206,8 +212,8 @@ export default function UsersPage() {
       {showCreate && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-              <h3 className="font-black text-gray-900">Add New User</h3>
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+              <h3 className="font-bold text-slate-900">Add New User</h3>
               <button onClick={() => { setShowCreate(false); setCreateError(''); }} className="text-gray-400 hover:text-gray-600 text-xl">×</button>
             </div>
             <form onSubmit={handleCreate} className="p-6 space-y-4">
@@ -251,7 +257,7 @@ export default function UsersPage() {
                 <input className={inputClass} value={form.phoneNumber || ''} onChange={(e) => setForm((f) => ({ ...f, phoneNumber: e.target.value }))} />
               </div>
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setShowCreate(false)} className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancel</button>
+                <button type="button" onClick={() => setShowCreate(false)} className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-gray-600 hover:bg-slate-50 transition-colors">Cancel</button>
                 <button type="submit" disabled={creating} className="flex-1 text-white font-bold py-2.5 rounded-xl text-sm disabled:opacity-70 flex items-center justify-center gap-2" style={{ background: "linear-gradient(90deg, rgb(220,38,38), rgb(249,115,22))" }}>
                   {creating ? <span className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" /> : null}
                   {creating ? 'Creating...' : 'Create User'}

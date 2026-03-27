@@ -98,22 +98,49 @@ export default function AuditPage() {
   const errorPages = Math.ceil(errorTotal / ERROR_LIMIT);
   const currentErrorPage = Math.floor(errorOffset / ERROR_LIMIT) + 1;
 
+  // Derive stat cards from loaded audit data
+  const today = new Date().toDateString();
+  const eventsToday = auditLogs.filter(l => new Date(l.createdAt).toDateString() === today).length;
+  const failedLogins = auditLogs.filter(l => l.action.includes("LOGIN") && l.module === "auth" && (l.details as Record<string, unknown>)?.success === false).length;
+  const dataChanges = auditLogs.filter(l => ["CREATE", "UPDATE", "DELETE"].some(a => l.action.startsWith(a))).length;
+  const adminActions = auditLogs.filter(l => l.module === "roles" || l.module === "users").length;
+
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-black text-gray-900">Audit & Error Logs</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Track all user actions and system errors for security and compliance</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-[22px] font-bold text-slate-900">Audit & Error Logs</h1>
+          <p className="text-sm text-slate-500 mt-0.5">Track all user actions and system errors for security and compliance</p>
+        </div>
+      </div>
+
+      {/* Stat cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: "Events Today", value: eventsToday, icon: "📋", color: "text-indigo-600", bg: "bg-indigo-50" },
+          { label: "Failed Logins", value: failedLogins, icon: "🔑", color: "text-red-600", bg: "bg-red-50" },
+          { label: "Data Changes", value: dataChanges, icon: "✏️", color: "text-amber-600", bg: "bg-amber-50" },
+          { label: "Admin Actions", value: adminActions, icon: "🛡️", color: "text-purple-600", bg: "bg-purple-50" },
+        ].map(s => (
+          <div key={s.label} className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 ${s.bg}`}>{s.icon}</div>
+            <div>
+              <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
+              <div className="text-xs text-slate-500 mt-0.5">{s.label}</div>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit mb-6">
+      <div className="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit">
         {[
           { key: "audit" as const, label: "Audit Trail", icon: "📋" },
           { key: "errors" as const, label: "Error Log", icon: "⚠️" },
         ].map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${tab === t.key ? "bg-white shadow text-gray-900" : "text-gray-500 hover:text-gray-700"}`}>
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${tab === t.key ? "bg-white shadow-sm text-slate-900" : "text-slate-500 hover:text-slate-700"}`}>
             {t.icon} {t.label}
             {t.key === "errors" && errorTotal > 0 && (
               <span className="ml-1.5 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{errorTotal}</span>
@@ -126,11 +153,11 @@ export default function AuditPage() {
       {tab === "audit" && (
         <div className="space-y-4">
           {/* Filters */}
-          <div className="card p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl p-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div>
                 <label className="block text-xs font-bold text-gray-500 mb-1">Module</label>
-                <select className="input w-full text-sm" value={auditFilters.module}
+                <select className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all" value={auditFilters.module}
                   onChange={e => setAuditFilters(f => ({ ...f, module: e.target.value }))}>
                   <option value="">All modules</option>
                   {Object.keys(MODULE_COLORS).filter(k => k !== "default").map(m => (
@@ -140,26 +167,26 @@ export default function AuditPage() {
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-500 mb-1">Action contains</label>
-                <input className="input w-full text-sm" placeholder="e.g. CREATE, APPROVE" value={auditFilters.action}
+                <input className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all" placeholder="e.g. CREATE, APPROVE" value={auditFilters.action}
                   onChange={e => setAuditFilters(f => ({ ...f, action: e.target.value }))} />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-500 mb-1">From</label>
-                <input type="date" className="input w-full text-sm" value={auditFilters.from}
+                <input type="date" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all" value={auditFilters.from}
                   onChange={e => setAuditFilters(f => ({ ...f, from: e.target.value }))} />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-500 mb-1">To</label>
-                <input type="date" className="input w-full text-sm" value={auditFilters.to}
+                <input type="date" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all" value={auditFilters.to}
                   onChange={e => setAuditFilters(f => ({ ...f, to: e.target.value }))} />
               </div>
             </div>
             <div className="flex gap-2 mt-3">
-              <button onClick={() => loadAudit(0)} className="gradient-btn px-4 py-1.5 rounded-lg text-sm font-bold text-white">
+              <button onClick={() => loadAudit(0)} className="px-4 py-1.5 rounded-lg text-sm font-bold text-white" style={{ background: "linear-gradient(90deg, rgb(220,38,38), rgb(249,115,22))" }}>
                 Apply Filters
               </button>
               <button onClick={() => { setAuditFilters({ module: "", action: "", from: "", to: "" }); }}
-                className="px-4 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-500 hover:bg-gray-50">
+                className="px-4 py-1.5 rounded-lg border border-slate-200 text-sm text-gray-500 hover:bg-gray-50">
                 Clear
               </button>
             </div>
@@ -171,10 +198,10 @@ export default function AuditPage() {
           </div>
 
           {/* Log table */}
-          <div className="card overflow-hidden">
+          <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
             {auditLoading ? (
               <div className="space-y-3 p-4">
-                {[...Array(8)].map((_, i) => <div key={i} className="h-12 skeleton rounded-lg" />)}
+                {[...Array(8)].map((_, i) => <div key={i} className="h-12 bg-slate-100 animate-pulse rounded-lg" />)}
               </div>
             ) : auditLogs.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-40 gap-2">
@@ -185,7 +212,7 @@ export default function AuditPage() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="text-xs font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100">
+                    <tr className="text-xs font-bold text-gray-400 uppercase tracking-wider border-b border-slate-200">
                       <th className="text-left px-4 py-3">Event</th>
                       <th className="text-left px-4 py-3">User</th>
                       <th className="text-left px-4 py-3">Module</th>
@@ -241,11 +268,11 @@ export default function AuditPage() {
               <span className="text-sm text-gray-500">Page {currentAuditPage} of {auditPages}</span>
               <div className="flex gap-2">
                 <button disabled={auditOffset === 0} onClick={() => loadAudit(auditOffset - AUDIT_LIMIT)}
-                  className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40">
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40">
                   ← Prev
                 </button>
                 <button disabled={currentAuditPage >= auditPages} onClick={() => loadAudit(auditOffset + AUDIT_LIMIT)}
-                  className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40">
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40">
                   Next →
                 </button>
               </div>
@@ -263,17 +290,17 @@ export default function AuditPage() {
 
           {errorLoading ? (
             <div className="space-y-3">
-              {[...Array(5)].map((_, i) => <div key={i} className="h-20 skeleton rounded-xl" />)}
+              {[...Array(5)].map((_, i) => <div key={i} className="h-20 bg-slate-100 animate-pulse rounded-xl" />)}
             </div>
           ) : errorLogs.length === 0 ? (
-            <div className="card flex flex-col items-center justify-center h-48 gap-3">
+            <div className="bg-white border border-slate-200 rounded-2xl flex flex-col items-center justify-center h-48 gap-3">
               <span className="text-4xl">✅</span>
               <p className="text-gray-400 text-sm font-medium">No errors logged — system is healthy</p>
             </div>
           ) : (
             <div className="space-y-2">
               {errorLogs.map(err => (
-                <div key={err.id} className="card overflow-hidden">
+                <div key={err.id} className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
                   <button className="w-full text-left p-4 hover:bg-gray-50 transition-colors"
                     onClick={() => setExpandedError(expandedError === err.id ? null : err.id)}>
                     <div className="flex items-start gap-3">
@@ -288,7 +315,7 @@ export default function AuditPage() {
                             </span>
                           )}
                           {err.method && (
-                            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{err.method}</span>
+                            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-100 text-gray-600">{err.method}</span>
                           )}
                           {err.endpoint && (
                             <span className="text-xs font-mono text-gray-500 truncate">{err.endpoint}</span>
@@ -305,7 +332,7 @@ export default function AuditPage() {
                   </button>
 
                   {expandedError === err.id && (
-                    <div className="px-4 pb-4 border-t border-gray-100">
+                    <div className="px-4 pb-4 border-t border-slate-200">
                       <div className="mt-3 space-y-2">
                         {err.userId && (
                           <div className="text-xs">
@@ -335,11 +362,11 @@ export default function AuditPage() {
               <span className="text-sm text-gray-500">Page {currentErrorPage} of {errorPages}</span>
               <div className="flex gap-2">
                 <button disabled={errorOffset === 0} onClick={() => loadErrors(errorOffset - ERROR_LIMIT)}
-                  className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40">
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40">
                   ← Prev
                 </button>
                 <button disabled={currentErrorPage >= errorPages} onClick={() => loadErrors(errorOffset + ERROR_LIMIT)}
-                  className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40">
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40">
                   Next →
                 </button>
               </div>

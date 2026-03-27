@@ -143,12 +143,12 @@ export default function RolesPage() {
       )}
 
       {/* ══════════════ LEFT PANEL ══════════════ */}
-      <aside className="w-64 shrink-0 bg-white border-r border-gray-100 flex flex-col">
+      <aside className="w-64 shrink-0 bg-white border-r border-slate-200 flex flex-col">
 
         {/* header */}
         <div className="px-4 pt-5 pb-3">
           <div className="flex items-center justify-between">
-            <h2 className="font-black text-gray-900 text-base tracking-tight">Roles</h2>
+            <h2 className="font-bold text-slate-900 text-base tracking-tight">Roles</h2>
             <button
               onClick={startNew}
               className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-lg leading-none font-bold transition-transform hover:scale-110"
@@ -238,7 +238,7 @@ export default function RolesPage() {
                   </div>
                   <div className="flex-1 space-y-1.5">
                     <input
-                      className="w-full text-lg font-black text-gray-900 outline-none border-b-2 border-transparent focus:border-gray-200 pb-0.5 placeholder-gray-300 bg-transparent"
+                      className="w-full text-lg font-bold text-slate-900 outline-none border-b-2 border-transparent focus:border-gray-200 pb-0.5 placeholder-gray-300 bg-transparent"
                       placeholder="Role name…"
                       value={form.name}
                       onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
@@ -407,7 +407,7 @@ export default function RolesPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-xs w-full animate-scale-in text-center">
             <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center text-3xl mx-auto mb-3">🗑</div>
-            <h3 className="font-black text-gray-900 text-lg mb-1">Delete Role?</h3>
+            <h3 className="font-bold text-slate-900 text-lg mb-1">Delete Role?</h3>
             <p className="text-sm text-gray-400 mb-5">
               This cannot be undone. Roles with users assigned cannot be deleted.
             </p>

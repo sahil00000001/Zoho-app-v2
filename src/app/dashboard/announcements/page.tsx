@@ -44,7 +44,7 @@ interface Department { id: string; name: string; }
 const PRIORITY_CONFIG: Record<Priority, { label: string; color: string; bg: string; dot: string }> = {
   HIGH: { label: 'High', color: 'text-red-700', bg: 'bg-red-50 border-red-200', dot: 'bg-red-500' },
   NORMAL: { label: 'Normal', color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200', dot: 'bg-blue-400' },
-  LOW: { label: 'Low', color: 'text-gray-500', bg: 'bg-gray-50 border-gray-200', dot: 'bg-gray-400' },
+  LOW: { label: 'Low', color: 'text-gray-500', bg: 'bg-slate-50 border-slate-200', dot: 'bg-gray-400' },
 };
 
 function timeAgo(date: string) {
@@ -194,14 +194,14 @@ export default function AnnouncementsPage() {
     <div className="p-6 max-w-5xl mx-auto">
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Announcements</h1>
-          <p className="text-gray-500 text-sm mt-1">Company notices, department updates, and celebrations</p>
+          <h1 className="text-[22px] font-bold text-slate-900">Announcements</h1>
+          <p className="text-slate-500 text-sm mt-1">Stay updated with the latest company news and updates</p>
         </div>
         {canManage && (
           <button
             onClick={() => { resetForm(); setShowCompose(true); setTab('manage'); }}
-            className="shrink-0 px-4 py-2 rounded-xl text-sm font-semibold text-white shadow-sm"
-            style={{ background: 'linear-gradient(90deg, rgb(220,38,38), rgb(249,115,22))' }}
+            className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white rounded-xl shadow-lg shadow-red-500/20 hover:shadow-red-500/30 transition-all active:scale-95"
+            style={{ background: 'linear-gradient(135deg, #DC2626, #F97316)' }}
           >
             + New Announcement
           </button>
@@ -240,7 +240,7 @@ export default function AnnouncementsPage() {
       )}
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-5 bg-gray-100 p-1 rounded-xl w-fit">
+      <div className="flex gap-1 mb-5 bg-slate-100 p-1 rounded-xl w-fit">
         {[
           { id: 'feed', label: `📢 Feed${announcements.length > 0 ? ` (${announcements.length})` : ''}` },
           { id: 'celebrations', label: `🎉 Celebrations${totalCelebrations > 0 ? ` (${totalCelebrations})` : ''}` },
@@ -250,7 +250,7 @@ export default function AnnouncementsPage() {
             key={t.id}
             onClick={() => setTab(t.id as typeof tab)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              tab === t.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              tab === t.id ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
             }`}
           >
             {t.label}
@@ -293,7 +293,7 @@ export default function AnnouncementsPage() {
           )}
 
           {announcements.length === 0 && (
-            <div className="text-center py-20 bg-white rounded-2xl border border-gray-100">
+            <div className="text-center py-20 bg-white rounded-2xl border border-slate-200">
               <div className="text-5xl mb-3">📭</div>
               <p className="text-gray-500 font-medium">No announcements yet</p>
               <p className="text-gray-400 text-sm mt-1">Check back later for company updates</p>
@@ -312,7 +312,7 @@ export default function AnnouncementsPage() {
               <span className="text-xs font-normal text-gray-400">(next 7 days)</span>
             </h2>
             {celebrations.birthdays.length === 0 ? (
-              <div className="bg-white border border-gray-100 rounded-2xl p-8 text-center text-gray-400 text-sm">
+              <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center text-gray-400 text-sm">
                 No birthdays in the next 7 days
               </div>
             ) : (
@@ -331,7 +331,7 @@ export default function AnnouncementsPage() {
               <span className="text-xs font-normal text-gray-400">(next 7 days)</span>
             </h2>
             {celebrations.anniversaries.length === 0 ? (
-              <div className="bg-white border border-gray-100 rounded-2xl p-8 text-center text-gray-400 text-sm">
+              <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center text-gray-400 text-sm">
                 No work anniversaries in the next 7 days
               </div>
             ) : (
@@ -344,7 +344,7 @@ export default function AnnouncementsPage() {
           </div>
 
           {totalCelebrations === 0 && (
-            <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
+            <div className="text-center py-16 bg-white rounded-2xl border border-slate-200">
               <div className="text-5xl mb-3">🗓️</div>
               <p className="text-gray-500">No celebrations in the next 7 days</p>
             </div>
@@ -357,19 +357,19 @@ export default function AnnouncementsPage() {
         <div className="space-y-5">
           {/* Compose / Edit form */}
           {showCompose && (
-            <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-5">
+            <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5">
               <h2 className="font-semibold text-gray-800 mb-4">
                 {editId ? 'Edit Announcement' : 'New Announcement'}
               </h2>
               <div className="space-y-4">
                 <input
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-red-200"
+                  className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-red-200"
                   placeholder="Announcement title *"
                   value={form.title}
                   onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
                 />
                 <textarea
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-200 resize-none"
+                  className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-200 resize-none"
                   placeholder="Write your announcement here... *"
                   rows={5}
                   value={form.content}
@@ -379,7 +379,7 @@ export default function AnnouncementsPage() {
                   <div>
                     <label className="block text-xs text-gray-500 mb-1">Audience</label>
                     <select
-                      className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                      className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                       value={form.type}
                       onChange={e => setForm(p => ({ ...p, type: e.target.value as AnnType }))}
                     >
@@ -391,7 +391,7 @@ export default function AnnouncementsPage() {
                     <div>
                       <label className="block text-xs text-gray-500 mb-1">Department</label>
                       <select
-                        className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                        className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                         value={form.departmentId}
                         onChange={e => setForm(p => ({ ...p, departmentId: e.target.value }))}
                       >
@@ -405,7 +405,7 @@ export default function AnnouncementsPage() {
                   <div>
                     <label className="block text-xs text-gray-500 mb-1">Priority</label>
                     <select
-                      className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                      className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                       value={form.priority}
                       onChange={e => setForm(p => ({ ...p, priority: e.target.value as Priority }))}
                     >
@@ -418,7 +418,7 @@ export default function AnnouncementsPage() {
                     <label className="block text-xs text-gray-500 mb-1">Expires On</label>
                     <input
                       type="date"
-                      className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                      className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                       value={form.expiresAt}
                       onChange={e => setForm(p => ({ ...p, expiresAt: e.target.value }))}
                     />
@@ -445,7 +445,7 @@ export default function AnnouncementsPage() {
                 </button>
                 <button
                   onClick={resetForm}
-                  className="px-5 py-2 rounded-xl text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200"
+                  className="px-5 py-2 rounded-xl text-sm font-medium text-gray-600 bg-slate-100 hover:bg-gray-200"
                 >
                   Cancel
                 </button>
@@ -456,7 +456,7 @@ export default function AnnouncementsPage() {
           {!showCompose && (
             <button
               onClick={() => { resetForm(); setShowCompose(true); }}
-              className="w-full py-3 border-2 border-dashed border-gray-200 rounded-2xl text-sm text-gray-400 hover:border-red-300 hover:text-red-400 transition-colors"
+              className="w-full py-3 border-2 border-dashed border-slate-200 rounded-2xl text-sm text-gray-400 hover:border-red-300 hover:text-red-400 transition-colors"
             >
               + Post new announcement
             </button>
@@ -465,7 +465,7 @@ export default function AnnouncementsPage() {
           {/* List all announcements for management */}
           <div className="space-y-3">
             {announcements.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-2xl border border-gray-100 text-gray-400 text-sm">
+              <div className="text-center py-12 bg-white rounded-2xl border border-slate-200 text-gray-400 text-sm">
                 No announcements posted yet
               </div>
             ) : (
@@ -506,7 +506,7 @@ function AnnouncementCard({
   const shortContent = ann.content.length > 200;
 
   return (
-    <div className={`bg-white border rounded-2xl shadow-sm overflow-hidden transition-all ${ann.isPinned ? 'border-yellow-200 ring-1 ring-yellow-100' : 'border-gray-100'} ${isExpired ? 'opacity-60' : ''}`}>
+    <div className={`bg-white border rounded-2xl shadow-sm overflow-hidden transition-all hover:shadow-md duration-200 ${ann.isPinned ? 'border-yellow-200 ring-1 ring-yellow-100' : 'border-slate-200'} ${isExpired ? 'opacity-60' : ''}`}>
       {/* Priority stripe */}
       {ann.priority === 'HIGH' && (
         <div className="h-1 w-full" style={{ background: 'linear-gradient(90deg, rgb(220,38,38), rgb(249,115,22))' }} />
@@ -524,7 +524,7 @@ function AnnouncementCard({
               <span className={`text-xs px-2 py-0.5 rounded-full ${ann.type === 'COMPANY' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'}`}>
                 {ann.type === 'COMPANY' ? '🌐 Company' : '🏢 Dept'}
               </span>
-              {isExpired && <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-400">Expired</span>}
+              {isExpired && <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-gray-400">Expired</span>}
             </div>
 
             {/* Content */}
@@ -595,10 +595,10 @@ function CelebrationCard({ person, type }: { person: Celebration; type: 'birthda
   const isBirthday = type === 'birthday';
 
   return (
-    <div className={`bg-white border rounded-2xl p-4 shadow-sm flex items-center gap-4 transition-all ${
+    <div className={`bg-white border rounded-2xl p-4 shadow-sm flex items-center gap-4 transition-all hover:shadow-md ${
       person.isToday
         ? isBirthday ? 'border-pink-200 ring-1 ring-pink-100' : 'border-yellow-200 ring-1 ring-yellow-100'
-        : 'border-gray-100'
+        : 'border-slate-200'
     }`}>
       {/* Avatar */}
       <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0 overflow-hidden ${
@@ -626,7 +626,7 @@ function CelebrationCard({ person, type }: { person: Celebration; type: 'birthda
       <div className={`text-xs font-semibold px-2.5 py-1 rounded-full shrink-0 ${
         person.isToday
           ? isBirthday ? 'bg-pink-100 text-pink-700' : 'bg-yellow-100 text-yellow-700'
-          : 'bg-gray-100 text-gray-500'
+          : 'bg-slate-100 text-gray-500'
       }`}>
         {daysLabel(person.daysUntil)}
       </div>

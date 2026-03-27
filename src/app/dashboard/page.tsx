@@ -130,7 +130,7 @@ export default function DashboardPage() {
       {/* ── Stats Grid ── */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-bold text-gray-500 uppercase tracking-widest">Overview</h2>
+          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Overview</h2>
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {loading ? (
@@ -166,11 +166,11 @@ export default function DashboardPage() {
 
       {/* ── At a Glance ── */}
       <div>
-        <h2 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-3">At a Glance</h2>
+        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">At a Glance</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 
           {/* Card 1 — Today's attendance status */}
-          <div className="card p-5">
+          <div className="bg-white border border-slate-200 rounded-2xl p-5">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <span className="text-base">🕐</span>
@@ -207,7 +207,7 @@ export default function DashboardPage() {
                 </div>
                 {(todayAtt.workHours != null || todayAtt.checkInTime) && (
                   <div className="pt-1">
-                    <div className="text-lg font-black text-gray-800">
+                    <div className="text-lg font-bold text-slate-800">
                       {todayAtt.workHours != null
                         ? `${todayAtt.workHours.toFixed(1)}h`
                         : todayAtt.checkInTime ? elapsed(todayAtt.checkInTime) : "—"}
@@ -229,7 +229,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Card 2 — Leave balance */}
-          <div className="card p-5">
+          <div className="bg-white border border-slate-200 rounded-2xl p-5">
             <div className="flex items-center gap-2 mb-3">
               <span className="text-base">🌿</span>
               <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Leave Balance</span>
@@ -268,7 +268,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Card 3 — Pending approvals (managers) or My leave status (employees) */}
-          <div className="card p-5">
+          <div className="bg-white border border-slate-200 rounded-2xl p-5">
             {isRole("MANAGER", "HR", "ADMIN") ? (
               <>
                 <div className="flex items-center gap-2 mb-3">
@@ -324,7 +324,7 @@ export default function DashboardPage() {
                   <>
                     <div className="flex gap-5">
                       <div>
-                        <div className="text-3xl font-black text-gray-800">{stats?.leavesUsedThisYear ?? 0}</div>
+                        <div className="text-3xl font-bold text-slate-800">{stats?.leavesUsedThisYear ?? 0}</div>
                         <div className="text-[11px] text-gray-400 mt-0.5">used this year</div>
                       </div>
                       {(stats?.pendingLeaves ?? 0) > 0 && (
@@ -353,13 +353,13 @@ export default function DashboardPage() {
       {/* ── Recent Activity ── */}
       {!loading && (
         <div className="animate-fade-in-up delay-200">
-          <h2 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-3">Recent Activity</h2>
+          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Recent Activity</h2>
           {activity.length === 0 ? (
-            <div className="card p-8 text-center">
+            <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center">
               <p className="text-sm text-gray-400">No recent activity yet</p>
             </div>
           ) : (
-            <div className="card p-4">
+            <div className="bg-white border border-slate-200 rounded-2xl p-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
                 {activity.map((item) => (
                   <div key={item.id} className="flex items-start gap-2.5 py-2 border-b border-gray-50 last:border-0">
@@ -437,13 +437,13 @@ function StatCard({ label, value, icon, variant, trend, urgent }: {
 }) {
   const v = STAT_VARIANTS[variant];
   return (
-    <div className={`card card-interactive p-5 border ${v.bg} animate-count-up`}>
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl mb-3 bg-white/60 shadow-sm ${urgent ? "animate-pulse-soft" : ""}`}>
+    <div className={`bg-white border border-slate-200 rounded-2xl p-5 hover:-translate-y-0.5 hover:shadow-md transition-all animate-count-up`}>
+      <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg mb-3 ${urgent ? "animate-pulse-soft" : ""} ${v.bg} bg-opacity-60`}>
         {icon}
       </div>
-      <div className={`text-3xl font-black mb-1 ${v.val}`}>{value}</div>
-      <div className="text-xs font-semibold text-gray-700 mb-0.5">{label}</div>
-      {trend && <div className={`text-xs ${v.sub} opacity-80`}>{trend}</div>}
+      <div className={`text-3xl font-bold mb-1 text-slate-900`}>{value}</div>
+      <div className="text-sm font-medium text-slate-600 mb-0.5">{label}</div>
+      {trend && <div className={`text-xs text-slate-400`}>{trend}</div>}
     </div>
   );
 }

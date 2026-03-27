@@ -72,7 +72,7 @@ const TASK_STATUS_CONFIG: Record<TaskStatus, { label: string; color: string; bg:
   PENDING: { label: 'Pending', color: 'text-yellow-700', bg: 'bg-yellow-50 border-yellow-200' },
   IN_PROGRESS: { label: 'In Progress', color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200' },
   COMPLETED: { label: 'Completed', color: 'text-green-700', bg: 'bg-green-50 border-green-200' },
-  SKIPPED: { label: 'Skipped', color: 'text-gray-500', bg: 'bg-gray-50 border-gray-200' },
+  SKIPPED: { label: 'Skipped', color: 'text-slate-500', bg: 'bg-gray-50 border-slate-200' },
 };
 
 const IT_STATUS_CONFIG: Record<ITStatus, { label: string; color: string; dot: string }> = {
@@ -87,7 +87,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   IT: 'bg-blue-100 text-blue-700',
   Manager: 'bg-green-100 text-green-700',
   Finance: 'bg-orange-100 text-orange-700',
-  General: 'bg-gray-100 text-gray-700',
+  General: 'bg-slate-100 text-gray-700',
 };
 
 const ASSET_TYPE_ICONS: Record<string, string> = {
@@ -309,7 +309,7 @@ export default function OnboardingPage() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <div className="w-10 h-10 border-2 border-red-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-gray-500 text-sm">Loading onboarding...</p>
+          <p className="text-slate-500 text-sm">Loading onboarding...</p>
         </div>
       </div>
     );
@@ -319,8 +319,8 @@ export default function OnboardingPage() {
     <div className="p-6 max-w-6xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Onboarding</h1>
-        <p className="text-gray-500 text-sm mt-1">New hire checklist, asset tracking, and IT provisioning</p>
+        <h1 className="text-[22px] font-bold text-slate-900">Onboarding</h1>
+        <p className="text-slate-500 text-sm mt-0.5">New hire checklist, asset tracking, and IT provisioning</p>
       </div>
 
       {error && (
@@ -334,7 +334,7 @@ export default function OnboardingPage() {
       {canManage && (
         <div className="mb-5 flex items-center gap-3 flex-wrap">
           <select
-            className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200 bg-white"
+            className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200 bg-white"
             value={selectedUserId}
             onChange={e => handleUserChange(e.target.value)}
           >
@@ -358,15 +358,15 @@ export default function OnboardingPage() {
 
       {/* Progress bar */}
       {tasks.length > 0 && (
-        <div className="mb-6 bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
+        <div className="mb-6 bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
           <div className="flex items-center justify-between mb-2">
             <div>
               <span className="text-sm font-semibold text-gray-800">Overall Progress</span>
-              <span className="ml-2 text-xs text-gray-400">{completedCount}/{tasks.length} tasks completed</span>
+              <span className="ml-2 text-xs text-slate-400">{completedCount}/{tasks.length} tasks completed</span>
             </div>
             <span className="text-lg font-bold" style={{ color: 'rgb(220,38,38)' }}>{progress}%</span>
           </div>
-          <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+          <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-500"
               style={{ width: `${progress}%`, background: 'linear-gradient(90deg, rgb(220,38,38), rgb(249,115,22))' }}
@@ -388,7 +388,7 @@ export default function OnboardingPage() {
       )}
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-5 bg-gray-100 p-1 rounded-xl w-fit">
+      <div className="flex gap-1 mb-5 bg-slate-100 p-1 rounded-xl w-fit">
         {[
           { id: 'checklist', label: '✅ Checklist' },
           { id: 'assets', label: '📦 Assets' },
@@ -398,7 +398,7 @@ export default function OnboardingPage() {
             key={t.id}
             onClick={() => setTab(t.id as typeof tab)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              tab === t.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              tab === t.id ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
             }`}
           >
             {t.label}
@@ -423,9 +423,9 @@ export default function OnboardingPage() {
           </div>
 
           {tasks.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
+            <div className="text-center py-16 bg-white rounded-2xl border border-slate-200">
               <div className="text-4xl mb-3">🚀</div>
-              <p className="text-gray-500 text-sm">
+              <p className="text-slate-500 text-sm">
                 {canManage ? 'Select an employee and click "Initialize Onboarding" to begin.' : 'Your onboarding checklist has not been set up yet. Contact HR.'}
               </p>
             </div>
@@ -436,10 +436,10 @@ export default function OnboardingPage() {
                 if (groupTasks.length === 0) return null;
                 const groupDone = groupTasks.filter(t => t.status === 'COMPLETED').length;
                 return (
-                  <div key={group.label} className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+                  <div key={group.label} className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
                     <div className="px-4 py-3 border-b border-gray-50 flex items-center justify-between bg-gray-50/50">
                       <h3 className="font-semibold text-gray-800 text-sm">{group.label}</h3>
-                      <span className="text-xs text-gray-400">{groupDone}/{groupTasks.length}</span>
+                      <span className="text-xs text-slate-400">{groupDone}/{groupTasks.length}</span>
                     </div>
                     <div className="divide-y divide-gray-50">
                       {groupTasks.map(task => {
@@ -460,18 +460,18 @@ export default function OnboardingPage() {
 
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <span className={`text-sm font-medium ${task.status === 'COMPLETED' ? 'line-through text-gray-400' : 'text-gray-800'}`}>
+                                <span className={`text-sm font-medium ${task.status === 'COMPLETED' ? 'line-through text-slate-400' : 'text-gray-800'}`}>
                                   {task.title}
                                 </span>
-                                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${CATEGORY_COLORS[task.category] || 'bg-gray-100 text-gray-600'}`}>
+                                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${CATEGORY_COLORS[task.category] || 'bg-slate-100 text-gray-600'}`}>
                                   {task.category}
                                 </span>
                                 {task.responsibleRole && (
-                                  <span className="text-xs text-gray-400">by {task.responsibleRole}</span>
+                                  <span className="text-xs text-slate-400">by {task.responsibleRole}</span>
                                 )}
                               </div>
                               {task.description && (
-                                <p className="text-xs text-gray-400 mt-0.5">{task.description}</p>
+                                <p className="text-xs text-slate-400 mt-0.5">{task.description}</p>
                               )}
                               {task.completedAt && (
                                 <p className="text-xs text-green-500 mt-0.5">
@@ -515,16 +515,16 @@ export default function OnboardingPage() {
           {showAddTask && (
             <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
               <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl">
-                <h3 className="font-bold text-gray-900 mb-4">Add Onboarding Task</h3>
+                <h3 className="font-bold text-slate-900 mb-4">Add Onboarding Task</h3>
                 <div className="space-y-3">
                   <input
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                    className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                     placeholder="Task title *"
                     value={newTask.title}
                     onChange={e => setNewTask(p => ({ ...p, title: e.target.value }))}
                   />
                   <textarea
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200 resize-none"
+                    className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200 resize-none"
                     placeholder="Description (optional)"
                     rows={2}
                     value={newTask.description}
@@ -532,9 +532,9 @@ export default function OnboardingPage() {
                   />
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">Category</label>
+                      <label className="block text-xs text-slate-500 mb-1">Category</label>
                       <select
-                        className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                        className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                         value={newTask.category}
                         onChange={e => setNewTask(p => ({ ...p, category: e.target.value }))}
                       >
@@ -544,19 +544,19 @@ export default function OnboardingPage() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">Due Day (1–30)</label>
+                      <label className="block text-xs text-slate-500 mb-1">Due Day (1–30)</label>
                       <input
                         type="number"
                         min={1}
                         max={30}
-                        className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                        className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                         value={newTask.dueDay}
                         onChange={e => setNewTask(p => ({ ...p, dueDay: parseInt(e.target.value) || 1 }))}
                       />
                     </div>
                   </div>
                   <input
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                    className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                     placeholder="Responsible (e.g. HR, IT, MANAGER)"
                     value={newTask.responsibleRole}
                     onChange={e => setNewTask(p => ({ ...p, responsibleRole: e.target.value }))}
@@ -572,7 +572,7 @@ export default function OnboardingPage() {
                   </button>
                   <button
                     onClick={() => setShowAddTask(false)}
-                    className="flex-1 py-2 rounded-xl text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200"
+                    className="flex-1 py-2 rounded-xl text-sm font-medium text-gray-600 bg-slate-100 hover:bg-gray-200"
                   >
                     Cancel
                   </button>
@@ -591,24 +591,24 @@ export default function OnboardingPage() {
             <div>
               <h2 className="font-semibold text-gray-800 mb-4">My Assigned Assets</h2>
               {onboardingData?.assetAssignments.length === 0 ? (
-                <div className="text-center py-12 bg-white rounded-2xl border border-gray-100">
+                <div className="text-center py-12 bg-white rounded-2xl border border-slate-200">
                   <div className="text-4xl mb-2">📦</div>
-                  <p className="text-gray-400 text-sm">No assets assigned to you</p>
+                  <p className="text-slate-400 text-sm">No assets assigned to you</p>
                 </div>
               ) : (
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {(onboardingData?.assetAssignments || []).map(a => (
-                    <div key={a.id} className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
+                    <div key={a.id} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
                       <div className="flex items-start gap-3">
                         <span className="text-3xl">{ASSET_TYPE_ICONS[a.asset.type] || '📦'}</span>
                         <div>
-                          <div className="font-semibold text-gray-900 text-sm">{a.asset.name}</div>
-                          {a.asset.model && <div className="text-xs text-gray-400">{a.asset.model}</div>}
-                          {a.asset.serialNumber && <div className="text-xs text-gray-400">S/N: {a.asset.serialNumber}</div>}
-                          <div className="text-xs text-gray-400 mt-1">
+                          <div className="font-semibold text-slate-900 text-sm">{a.asset.name}</div>
+                          {a.asset.model && <div className="text-xs text-slate-400">{a.asset.model}</div>}
+                          {a.asset.serialNumber && <div className="text-xs text-slate-400">S/N: {a.asset.serialNumber}</div>}
+                          <div className="text-xs text-slate-400 mt-1">
                             Assigned {new Date(a.assignedAt).toLocaleDateString()}
                           </div>
-                          {a.condition && <div className="text-xs text-gray-500 mt-0.5">Condition: {a.condition}</div>}
+                          {a.condition && <div className="text-xs text-slate-500 mt-0.5">Condition: {a.condition}</div>}
                         </div>
                       </div>
                     </div>
@@ -631,13 +631,13 @@ export default function OnboardingPage() {
               </div>
 
               {/* Assign asset form */}
-              <div className="mb-4 bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
+              <div className="mb-4 bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
                 <h3 className="text-sm font-semibold text-gray-700 mb-3">Assign Asset to Employee</h3>
                 <div className="flex gap-3 flex-wrap items-end">
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Asset</label>
+                    <label className="block text-xs text-slate-500 mb-1">Asset</label>
                     <select
-                      className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                      className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                       value={assignAssetId}
                       onChange={e => setAssignAssetId(e.target.value)}
                     >
@@ -648,9 +648,9 @@ export default function OnboardingPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Employee</label>
+                    <label className="block text-xs text-slate-500 mb-1">Employee</label>
                     <select
-                      className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                      className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                       value={assignUserId}
                       onChange={e => setAssignUserId(e.target.value)}
                     >
@@ -661,9 +661,9 @@ export default function OnboardingPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Condition</label>
+                    <label className="block text-xs text-slate-500 mb-1">Condition</label>
                     <input
-                      className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                      className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                       placeholder="e.g. New, Good"
                       value={assignCondition}
                       onChange={e => setAssignCondition(e.target.value)}
@@ -681,20 +681,20 @@ export default function OnboardingPage() {
               </div>
 
               {/* Assets table */}
-              <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+              <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
                 <table className="w-full text-sm">
-                  <thead className="bg-gray-50 border-b border-gray-100">
+                  <thead className="bg-gray-50 border-b border-slate-200">
                     <tr>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">Asset</th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">Serial / Model</th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">Status</th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">Assigned To</th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">Action</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Asset</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Serial / Model</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Status</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Assigned To</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {assets.length === 0 && (
-                      <tr><td colSpan={5} className="text-center py-8 text-gray-400 text-sm">No assets registered</td></tr>
+                      <tr><td colSpan={5} className="text-center py-8 text-slate-400 text-sm">No assets registered</td></tr>
                     )}
                     {assets.map(asset => {
                       const currentAssignment = asset.assignments?.[0];
@@ -702,7 +702,7 @@ export default function OnboardingPage() {
                         AVAILABLE: 'bg-green-50 text-green-700',
                         ASSIGNED: 'bg-blue-50 text-blue-700',
                         UNDER_MAINTENANCE: 'bg-yellow-50 text-yellow-700',
-                        RETIRED: 'bg-gray-50 text-gray-500',
+                        RETIRED: 'bg-gray-50 text-slate-500',
                       };
                       return (
                         <tr key={asset.id} className="hover:bg-gray-50/50">
@@ -710,14 +710,14 @@ export default function OnboardingPage() {
                             <div className="flex items-center gap-2">
                               <span className="text-xl">{ASSET_TYPE_ICONS[asset.type] || '📦'}</span>
                               <div>
-                                <div className="font-medium text-gray-900">{asset.name}</div>
-                                <div className="text-xs text-gray-400 capitalize">{asset.type.replace('_', ' ')}</div>
+                                <div className="font-medium text-slate-900">{asset.name}</div>
+                                <div className="text-xs text-slate-400 capitalize">{asset.type.replace('_', ' ')}</div>
                               </div>
                             </div>
                           </td>
-                          <td className="px-4 py-3 text-gray-500">
+                          <td className="px-4 py-3 text-slate-500">
                             {asset.serialNumber && <div className="text-xs">{asset.serialNumber}</div>}
-                            {asset.model && <div className="text-xs text-gray-400">{asset.model}</div>}
+                            {asset.model && <div className="text-xs text-slate-400">{asset.model}</div>}
                           </td>
                           <td className="px-4 py-3">
                             <span className={`text-xs px-2 py-1 rounded-full font-medium ${statusColors[asset.status]}`}>
@@ -728,7 +728,7 @@ export default function OnboardingPage() {
                             {currentAssignment?.user ? (
                               <div className="text-xs">
                                 <div className="font-medium text-gray-800">{currentAssignment.user.firstName} {currentAssignment.user.lastName}</div>
-                                <div className="text-gray-400">{currentAssignment.user.employeeId}</div>
+                                <div className="text-slate-400">{currentAssignment.user.employeeId}</div>
                               </div>
                             ) : (
                               <span className="text-gray-300 text-xs">—</span>
@@ -755,12 +755,12 @@ export default function OnboardingPage() {
               {showAddAsset && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
                   <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl">
-                    <h3 className="font-bold text-gray-900 mb-4">Add New Asset</h3>
+                    <h3 className="font-bold text-slate-900 mb-4">Add New Asset</h3>
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-xs text-gray-500 mb-1">Type</label>
+                        <label className="block text-xs text-slate-500 mb-1">Type</label>
                         <select
-                          className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                          className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                           value={newAsset.type}
                           onChange={e => setNewAsset(p => ({ ...p, type: e.target.value }))}
                         >
@@ -770,25 +770,25 @@ export default function OnboardingPage() {
                         </select>
                       </div>
                       <input
-                        className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                        className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                         placeholder="Asset name * (e.g. MacBook Pro 14)"
                         value={newAsset.name}
                         onChange={e => setNewAsset(p => ({ ...p, name: e.target.value }))}
                       />
                       <input
-                        className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                        className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                         placeholder="Serial number"
                         value={newAsset.serialNumber}
                         onChange={e => setNewAsset(p => ({ ...p, serialNumber: e.target.value }))}
                       />
                       <input
-                        className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                        className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                         placeholder="Model"
                         value={newAsset.model}
                         onChange={e => setNewAsset(p => ({ ...p, model: e.target.value }))}
                       />
                       <input
-                        className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                        className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                         placeholder="Notes"
                         value={newAsset.notes}
                         onChange={e => setNewAsset(p => ({ ...p, notes: e.target.value }))}
@@ -804,7 +804,7 @@ export default function OnboardingPage() {
                       </button>
                       <button
                         onClick={() => setShowAddAsset(false)}
-                        className="flex-1 py-2 rounded-xl text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200"
+                        className="flex-1 py-2 rounded-xl text-sm font-medium text-gray-600 bg-slate-100 hover:bg-gray-200"
                       >
                         Cancel
                       </button>
@@ -826,19 +826,19 @@ export default function OnboardingPage() {
             // Employee: my IT provisions
             <div className="grid gap-3 sm:grid-cols-2">
               {(onboardingData?.itProvisions || []).length === 0 ? (
-                <div className="col-span-2 text-center py-12 bg-white rounded-2xl border border-gray-100">
+                <div className="col-span-2 text-center py-12 bg-white rounded-2xl border border-slate-200">
                   <div className="text-4xl mb-2">🖥️</div>
-                  <p className="text-gray-400 text-sm">No IT provisioning items set up yet</p>
+                  <p className="text-slate-400 text-sm">No IT provisioning items set up yet</p>
                 </div>
               ) : (
                 (onboardingData?.itProvisions || []).map((item: ITProvision) => {
                   const cfg = IT_STATUS_CONFIG[item.status];
                   return (
-                    <div key={item.id} className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm flex items-center gap-3">
+                    <div key={item.id} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex items-center gap-3">
                       <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${cfg.dot}`} />
                       <div className="flex-1">
-                        <div className="font-medium text-gray-900 text-sm">{item.item}</div>
-                        {item.notes && <div className="text-xs text-gray-400 mt-0.5">{item.notes}</div>}
+                        <div className="font-medium text-slate-900 text-sm">{item.item}</div>
+                        {item.notes && <div className="text-xs text-slate-400 mt-0.5">{item.notes}</div>}
                         {item.completedAt && <div className="text-xs text-green-500 mt-0.5">Done {new Date(item.completedAt).toLocaleDateString()}</div>}
                       </div>
                       <span className={`text-xs px-2 py-1 rounded-full font-medium ${cfg.color}`}>{cfg.label}</span>
@@ -864,19 +864,19 @@ export default function OnboardingPage() {
                 })}
               </div>
 
-              <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+              <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
                 <table className="w-full text-sm">
-                  <thead className="bg-gray-50 border-b border-gray-100">
+                  <thead className="bg-gray-50 border-b border-slate-200">
                     <tr>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">Employee</th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">IT Item</th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">Status</th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">Actions</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Employee</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">IT Item</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Status</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {allITProvisions.length === 0 && (
-                      <tr><td colSpan={4} className="text-center py-8 text-gray-400 text-sm">No IT provision items</td></tr>
+                      <tr><td colSpan={4} className="text-center py-8 text-slate-400 text-sm">No IT provision items</td></tr>
                     )}
                     {allITProvisions.map(item => {
                       const cfg = IT_STATUS_CONFIG[item.status];
@@ -885,8 +885,8 @@ export default function OnboardingPage() {
                           <td className="px-4 py-3">
                             {item.user ? (
                               <div>
-                                <div className="font-medium text-gray-900 text-sm">{item.user.firstName} {item.user.lastName}</div>
-                                <div className="text-xs text-gray-400">{item.user.employeeId}</div>
+                                <div className="font-medium text-slate-900 text-sm">{item.user.firstName} {item.user.lastName}</div>
+                                <div className="text-xs text-slate-400">{item.user.employeeId}</div>
                               </div>
                             ) : <span className="text-gray-300">—</span>}
                           </td>
@@ -901,7 +901,7 @@ export default function OnboardingPage() {
                             <select
                               value={item.status}
                               onChange={e => handleITStatus(item.id, e.target.value as ITStatus)}
-                              className="text-xs border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-red-200"
+                              className="text-xs border border-slate-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-red-200"
                             >
                               <option value="PENDING">Pending</option>
                               <option value="IN_PROGRESS">In Progress</option>

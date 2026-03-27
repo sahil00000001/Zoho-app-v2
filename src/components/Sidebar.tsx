@@ -90,7 +90,7 @@ export default function Sidebar() {
                         ${collapsed ? "justify-center p-3" : "px-3 py-2.5"}
                         ${active
                           ? "text-white"
-                          : "text-gray-500 hover:bg-gray-50 hover:text-gray-800"
+                          : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                         }`}
                       style={active ? {
                         background: "linear-gradient(90deg, rgb(220,38,38), rgb(249,115,22))",

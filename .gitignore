@@ -41,6 +41,11 @@ yarn-error.log*
 # vercel
 .vercel
 
+# MCP config (contains API keys)
+.mcp.json
+stitch-mcp-server.mjs
+stitch-mcp-server.js
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

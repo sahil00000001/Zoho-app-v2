@@ -65,7 +65,7 @@ const ROLE_BADGE: Record<string, string> = {
   ADMIN: 'bg-red-100 text-red-700',
 };
 const LEVEL_COLOR: Record<string, string> = {
-  Beginner: 'bg-gray-100 text-gray-600',
+  Beginner: 'bg-slate-100 text-gray-600',
   Intermediate: 'bg-blue-100 text-blue-700',
   Advanced: 'bg-purple-100 text-purple-700',
   Expert: 'bg-green-100 text-green-700',
@@ -362,7 +362,7 @@ export default function ProfilePage() {
       )}
 
       {/* Profile header */}
-      <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden mb-6">
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden mb-6">
         {/* Orange banner */}
         <div className="h-36 w-full relative" style={{ background: 'linear-gradient(135deg, rgb(220,38,38), rgb(249,115,22))' }}>
           <div className="absolute top-5 right-10 w-28 h-28 rounded-full bg-white/10" />
@@ -373,7 +373,7 @@ export default function ProfilePage() {
           {/* Avatar row — overlaps the orange banner */}
           <div className="flex items-end gap-4 -mt-14 mb-4">
             <div className="relative shrink-0">
-              <div className="w-24 h-24 rounded-2xl border-4 border-white shadow-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+              <div className="w-24 h-24 rounded-2xl border-4 border-white shadow-lg overflow-hidden bg-slate-100 flex items-center justify-center">
                 {profile?.photoUrl ? (
                   <img src={profile.photoUrl} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
@@ -383,7 +383,7 @@ export default function ProfilePage() {
               <button
                 onClick={() => photoRef.current?.click()}
                 disabled={saving}
-                className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-white border border-gray-200 shadow flex items-center justify-center hover:bg-gray-50 text-sm"
+                className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-white border border-slate-200 shadow flex items-center justify-center hover:bg-gray-50 text-sm"
                 title="Change photo"
               >
                 📷
@@ -400,14 +400,14 @@ export default function ProfilePage() {
               {u?.designation && <span className="text-sm text-gray-500 font-medium">{u.designation}</span>}
               {u?.department && <span className="text-sm text-gray-400">· {u.department.name}</span>}
               {u?.role && (
-                <span className={`text-xs px-2.5 py-0.5 rounded-full font-semibold ${ROLE_BADGE[u.role] || 'bg-gray-100 text-gray-600'}`}>
+                <span className={`text-xs px-2.5 py-0.5 rounded-full font-semibold ${ROLE_BADGE[u.role] || 'bg-slate-100 text-gray-600'}`}>
                   {u.role}
                 </span>
               )}
             </div>
           </div>
           {/* Info grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-gray-100">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-200">
             {[
               { label: 'Employee ID', value: u?.employeeId },
               { label: 'Email', value: u?.email },
@@ -424,7 +424,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-5 bg-gray-100 p-1 rounded-xl w-fit">
+      <div className="flex gap-1 mb-5 bg-slate-100 p-1 rounded-xl w-fit">
         {[
           { id: 'personal', label: '👤 Personal' },
           { id: 'skills', label: '⚡ Skills' },
@@ -435,7 +435,7 @@ export default function ProfilePage() {
             key={t.id}
             onClick={() => setTab(t.id as typeof tab)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              tab === t.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              tab === t.id ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
             }`}
           >
             {t.label}
@@ -447,13 +447,13 @@ export default function ProfilePage() {
       {tab === 'personal' && (
         <div className="space-y-5">
           {/* Basic Info */}
-          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-5">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5">
             <h2 className="font-semibold text-gray-800 mb-4">Basic Information</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Phone Number</label>
                 <input
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                  className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                   placeholder="+91 98765 43210"
                   value={personalForm.phoneNumber}
                   onChange={e => setPersonalForm(p => ({ ...p, phoneNumber: e.target.value }))}
@@ -462,7 +462,7 @@ export default function ProfilePage() {
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Designation</label>
                 <input
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                  className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                   placeholder="e.g. Senior Developer"
                   value={personalForm.designation}
                   onChange={e => setPersonalForm(p => ({ ...p, designation: e.target.value }))}
@@ -471,7 +471,7 @@ export default function ProfilePage() {
               <div className="sm:col-span-2">
                 <label className="block text-xs text-gray-500 mb-1">Bio</label>
                 <textarea
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200 resize-none"
+                  className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200 resize-none"
                   placeholder="A short description about yourself..."
                   rows={3}
                   value={personalForm.bio}
@@ -482,13 +482,13 @@ export default function ProfilePage() {
           </div>
 
           {/* Address */}
-          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-5">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5">
             <h2 className="font-semibold text-gray-800 mb-4">Address</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
                 <label className="block text-xs text-gray-500 mb-1">Street Address</label>
                 <input
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                  className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                   placeholder="House no., Street, Area"
                   value={personalForm.address}
                   onChange={e => setPersonalForm(p => ({ ...p, address: e.target.value }))}
@@ -497,7 +497,7 @@ export default function ProfilePage() {
               <div>
                 <label className="block text-xs text-gray-500 mb-1">City</label>
                 <input
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                  className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                   placeholder="Mumbai"
                   value={personalForm.city}
                   onChange={e => setPersonalForm(p => ({ ...p, city: e.target.value }))}
@@ -506,7 +506,7 @@ export default function ProfilePage() {
               <div>
                 <label className="block text-xs text-gray-500 mb-1">State</label>
                 <input
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                  className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                   placeholder="Maharashtra"
                   value={personalForm.state}
                   onChange={e => setPersonalForm(p => ({ ...p, state: e.target.value }))}
@@ -515,7 +515,7 @@ export default function ProfilePage() {
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Pincode</label>
                 <input
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                  className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                   placeholder="400001"
                   value={personalForm.pincode}
                   onChange={e => setPersonalForm(p => ({ ...p, pincode: e.target.value }))}
@@ -525,13 +525,13 @@ export default function ProfilePage() {
           </div>
 
           {/* Emergency Contact */}
-          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-5">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5">
             <h2 className="font-semibold text-gray-800 mb-4">Emergency Contact</h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Contact Name</label>
                 <input
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                  className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                   placeholder="Full name"
                   value={personalForm.emergencyName}
                   onChange={e => setPersonalForm(p => ({ ...p, emergencyName: e.target.value }))}
@@ -540,7 +540,7 @@ export default function ProfilePage() {
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Phone</label>
                 <input
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                  className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                   placeholder="+91 98765 43210"
                   value={personalForm.emergencyPhone}
                   onChange={e => setPersonalForm(p => ({ ...p, emergencyPhone: e.target.value }))}
@@ -549,7 +549,7 @@ export default function ProfilePage() {
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Relationship</label>
                 <input
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                  className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                   placeholder="e.g. Spouse, Parent"
                   value={personalForm.emergencyRelation}
                   onChange={e => setPersonalForm(p => ({ ...p, emergencyRelation: e.target.value }))}
@@ -573,18 +573,18 @@ export default function ProfilePage() {
       {tab === 'skills' && (
         <div className="space-y-5">
           {/* Add skill */}
-          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-5">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5">
             <h2 className="font-semibold text-gray-800 mb-4">Add Skill</h2>
             <div className="flex gap-3 flex-wrap">
               <input
-                className="flex-1 min-w-48 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                className="flex-1 min-w-48 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                 placeholder="e.g. React, Python, Project Management"
                 value={skillName}
                 onChange={e => setSkillName(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleAddSkill()}
               />
               <select
-                className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                 value={skillLevel}
                 onChange={e => setSkillLevel(e.target.value)}
               >
@@ -602,7 +602,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Skills list */}
-          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-5">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5">
             <h2 className="font-semibold text-gray-800 mb-4">
               My Skills <span className="text-gray-400 font-normal text-sm">({data?.skills.length || 0})</span>
             </h2>
@@ -616,11 +616,11 @@ export default function ProfilePage() {
                 {data?.skills.map(skill => (
                   <div
                     key={skill.id}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-100 rounded-xl group hover:border-red-200 transition-colors"
+                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-slate-200 rounded-xl group hover:border-red-200 transition-colors"
                   >
                     <span className="text-sm font-medium text-gray-800">{skill.name}</span>
                     {skill.level && (
-                      <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${LEVEL_COLOR[skill.level] || 'bg-gray-100 text-gray-500'}`}>
+                      <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${LEVEL_COLOR[skill.level] || 'bg-slate-100 text-gray-500'}`}>
                         {skill.level}
                       </span>
                     )}
@@ -653,13 +653,13 @@ export default function ProfilePage() {
           </div>
 
           {showCertForm && (
-            <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-5">
+            <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5">
               <h3 className="font-semibold text-gray-800 mb-4 text-sm">New Certification</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="sm:col-span-2">
                   <label className="block text-xs text-gray-500 mb-1">Certification Name *</label>
                   <input
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                    className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                     placeholder="e.g. AWS Solutions Architect"
                     value={certForm.name}
                     onChange={e => setCertForm(p => ({ ...p, name: e.target.value }))}
@@ -668,7 +668,7 @@ export default function ProfilePage() {
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Issuing Organization</label>
                   <input
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                    className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                     placeholder="e.g. Amazon Web Services"
                     value={certForm.issuer}
                     onChange={e => setCertForm(p => ({ ...p, issuer: e.target.value }))}
@@ -677,7 +677,7 @@ export default function ProfilePage() {
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Credential ID</label>
                   <input
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                    className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                     placeholder="Certificate number / URL"
                     value={certForm.credentialId}
                     onChange={e => setCertForm(p => ({ ...p, credentialId: e.target.value }))}
@@ -687,7 +687,7 @@ export default function ProfilePage() {
                   <label className="block text-xs text-gray-500 mb-1">Issue Date</label>
                   <input
                     type="date"
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                    className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                     value={certForm.issueDate}
                     onChange={e => setCertForm(p => ({ ...p, issueDate: e.target.value }))}
                   />
@@ -696,7 +696,7 @@ export default function ProfilePage() {
                   <label className="block text-xs text-gray-500 mb-1">Expiry Date</label>
                   <input
                     type="date"
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                    className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                     value={certForm.expiryDate}
                     onChange={e => setCertForm(p => ({ ...p, expiryDate: e.target.value }))}
                   />
@@ -714,7 +714,7 @@ export default function ProfilePage() {
           )}
 
           {(data?.certifications.length || 0) === 0 && !showCertForm ? (
-            <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
+            <div className="text-center py-16 bg-white rounded-2xl border border-slate-200">
               <div className="text-4xl mb-2">🏆</div>
               <p className="text-gray-400 text-sm">No certifications added yet.</p>
             </div>
@@ -725,7 +725,7 @@ export default function ProfilePage() {
                 const expiringSoon = cert.expiryDate && !expired &&
                   new Date(cert.expiryDate) < new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
                 return (
-                  <div key={cert.id} className="bg-white border border-gray-100 rounded-2xl shadow-sm p-4 flex items-start gap-4">
+                  <div key={cert.id} className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 flex items-start gap-4">
                     <div className="w-10 h-10 rounded-xl bg-yellow-50 flex items-center justify-center text-xl shrink-0">🏆</div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
@@ -768,13 +768,13 @@ export default function ProfilePage() {
       {tab === 'kra' && (
         <div className="space-y-5">
           {/* Upload form */}
-          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-5">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5">
             <h2 className="font-semibold text-gray-800 mb-4">Upload KRA Document</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Title *</label>
                 <input
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                  className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                   placeholder="e.g. Annual KRA FY 2025-26"
                   value={kraTitle}
                   onChange={e => setKraTitle(e.target.value)}
@@ -783,7 +783,7 @@ export default function ProfilePage() {
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Period</label>
                 <input
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                  className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                   placeholder="e.g. Q1 2026, FY 2025-26"
                   value={kraPeriod}
                   onChange={e => setKraPeriod(e.target.value)}
@@ -793,7 +793,7 @@ export default function ProfilePage() {
             {/* File drop zone */}
             <div
               className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${
-                kraFile ? 'border-green-300 bg-green-50' : 'border-gray-200 hover:border-red-300 hover:bg-red-50/30'
+                kraFile ? 'border-green-300 bg-green-50' : 'border-slate-200 hover:border-red-300 hover:bg-red-50/30'
               }`}
               onClick={() => kraFileRef.current?.click()}
             >
@@ -839,7 +839,7 @@ export default function ProfilePage() {
           </div>
 
           {/* My KRA documents */}
-          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
             <div className="px-5 py-3 border-b border-gray-50 bg-gray-50/50">
               <h3 className="font-semibold text-gray-800 text-sm">My KRA Documents</h3>
             </div>
@@ -886,7 +886,7 @@ export default function ProfilePage() {
 
           {/* HR/Admin/Manager: all KRAs */}
           {(isHRAdmin || isManager) && (
-            <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+            <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
               <div className="px-5 py-3 border-b border-gray-50 bg-gray-50/50 flex items-center justify-between">
                 <h3 className="font-semibold text-gray-800 text-sm">All Employee KRA Documents</h3>
                 <span className="text-xs text-gray-400">{allKRA.length} total</span>
@@ -895,7 +895,7 @@ export default function ProfilePage() {
                 <div className="text-center py-10 text-gray-400 text-sm">No KRA documents submitted yet</div>
               ) : (
                 <table className="w-full text-sm">
-                  <thead className="bg-gray-50 border-b border-gray-100">
+                  <thead className="bg-gray-50 border-b border-slate-200">
                     <tr>
                       <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">Employee</th>
                       <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">Document</th>

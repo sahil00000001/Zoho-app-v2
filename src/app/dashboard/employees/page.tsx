@@ -143,7 +143,7 @@ export default function EmployeesPage() {
   );
 
   return (
-    <div className="space-y-5">
+    <div className="p-6 space-y-5">
       {/* Alerts */}
       {error && (
         <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm flex justify-between">
@@ -158,24 +158,32 @@ export default function EmployeesPage() {
         </div>
       )}
 
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-[22px] font-bold text-slate-900">Employees</h1>
+          <p className="text-slate-500 text-sm mt-0.5">{employees.length} team members across {departments.length} departments</p>
+        </div>
+      </div>
+
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         {[
-          { label: "Total", value: stats.total, color: "border-gray-200 bg-white" },
-          { label: "Employees", value: stats.employees, color: "border-blue-100 bg-blue-50" },
-          { label: "Managers", value: stats.managers, color: "border-green-100 bg-green-50" },
-          { label: "HR", value: stats.hr, color: "border-purple-100 bg-purple-50" },
-          { label: "Admins", value: stats.admins, color: "border-red-100 bg-red-50" },
+          { label: "Total", value: stats.total, color: "border-slate-200 bg-white", valColor: "text-slate-900" },
+          { label: "Employees", value: stats.employees, color: "border-blue-100 bg-blue-50", valColor: "text-blue-700" },
+          { label: "Managers", value: stats.managers, color: "border-green-100 bg-green-50", valColor: "text-green-700" },
+          { label: "HR", value: stats.hr, color: "border-purple-100 bg-purple-50", valColor: "text-purple-700" },
+          { label: "Admins", value: stats.admins, color: "border-red-100 bg-red-50", valColor: "text-red-700" },
         ].map(s => (
-          <div key={s.label} className={`rounded-xl border p-3 text-center ${s.color}`}>
-            <div className="text-xl font-bold text-gray-900">{s.value}</div>
-            <div className="text-xs text-gray-500 mt-0.5">{s.label}</div>
+          <div key={s.label} className={`rounded-xl border p-4 text-center ${s.color}`}>
+            <div className={`text-2xl font-bold ${s.valColor}`}>{s.value}</div>
+            <div className="text-xs text-slate-500 mt-0.5 font-medium uppercase tracking-wide">{s.label}</div>
           </div>
         ))}
       </div>
 
       {/* Toolbar */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-4">
+      <div className="bg-white rounded-2xl border border-slate-200 p-4">
         <div className="flex flex-wrap items-center gap-3">
           {/* Search */}
           <div className="relative flex-1 min-w-48">
@@ -185,7 +193,7 @@ export default function EmployeesPage() {
               placeholder="Search by name, ID, email, designation…"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full pl-8 pr-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+              className="w-full pl-8 pr-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
             />
           </div>
 
@@ -193,7 +201,7 @@ export default function EmployeesPage() {
           <select
             value={filterDept}
             onChange={e => setFilterDept(e.target.value)}
-            className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200 bg-white"
+            className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200 bg-white"
           >
             <option value="">All Departments</option>
             {departments.map(d => (
@@ -205,7 +213,7 @@ export default function EmployeesPage() {
           <select
             value={filterRole}
             onChange={e => setFilterRole(e.target.value)}
-            className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200 bg-white"
+            className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200 bg-white"
           >
             <option value="">All Roles</option>
             {["EMPLOYEE", "MANAGER", "HR", "ADMIN"].map(r => (
@@ -214,16 +222,16 @@ export default function EmployeesPage() {
           </select>
 
           {/* View toggle */}
-          <div className="flex rounded-xl overflow-hidden border border-gray-200 ml-auto">
+          <div className="flex rounded-xl overflow-hidden border border-slate-200 ml-auto">
             <button
               onClick={() => setViewMode("cards")}
-              className={`px-3 py-2 text-xs font-semibold transition-colors ${viewMode === "cards" ? "bg-red-500 text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
+              className={`px-3 py-2 text-xs font-semibold transition-colors ${viewMode === "cards" ? "bg-red-500 text-white" : "bg-white text-gray-600 hover:bg-slate-50"}`}
             >
               ⊞ Cards
             </button>
             <button
               onClick={() => setViewMode("table")}
-              className={`px-3 py-2 text-xs font-semibold transition-colors ${viewMode === "table" ? "bg-red-500 text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
+              className={`px-3 py-2 text-xs font-semibold transition-colors ${viewMode === "table" ? "bg-red-500 text-white" : "bg-white text-gray-600 hover:bg-slate-50"}`}
             >
               ≡ Table
             </button>
@@ -236,7 +244,7 @@ export default function EmployeesPage() {
       </div>
 
       {filtered.length === 0 && (
-        <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center text-gray-400">
+        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center text-gray-400">
           <div className="text-4xl mb-2">👥</div>
           <div className="text-sm">No employees match your search</div>
         </div>
@@ -250,7 +258,7 @@ export default function EmployeesPage() {
             const isEditing = emp.id in editingManager;
             const isSaving = savingManager[emp.id];
             return (
-              <div key={emp.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+              <div key={emp.id} className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
                 {/* Card top gradient strip */}
                 <div className="h-2 w-full" style={{ background: avatarGradient(fullName) }} />
                 <div className="p-5">
@@ -298,14 +306,14 @@ export default function EmployeesPage() {
                   </div>
 
                   {/* Manager section */}
-                  <div className="pt-3 border-t border-gray-100">
+                  <div className="pt-3 border-t border-slate-200">
                     <div className="text-xs text-gray-400 mb-1.5 font-medium uppercase tracking-wide">Manager</div>
                     {isEditing ? (
                       <div className="space-y-2">
                         <select
                           value={editingManager[emp.id]}
                           onChange={e => setEditingManager(s => ({ ...s, [emp.id]: e.target.value }))}
-                          className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-red-200 bg-white"
+                          className="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-red-200 bg-white"
                           autoFocus
                         >
                           <option value="__none__">— No manager —</option>
@@ -330,7 +338,7 @@ export default function EmployeesPage() {
                           <button
                             onClick={() => cancelEdit(emp.id)}
                             disabled={isSaving}
-                            className="flex-1 text-xs font-semibold text-gray-500 bg-gray-100 hover:bg-gray-200 py-1.5 rounded-lg transition-colors"
+                            className="flex-1 text-xs font-semibold text-gray-500 bg-slate-100 hover:bg-gray-200 py-1.5 rounded-lg transition-colors"
                           >
                             Cancel
                           </button>
@@ -361,11 +369,11 @@ export default function EmployeesPage() {
 
       {/* Table View */}
       {viewMode === "table" && filtered.length > 0 && (
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-100">
+                <tr className="bg-slate-50 border-b border-slate-200">
                   <th className="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Employee</th>
                   <th className="text-left px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Department</th>
                   <th className="text-left px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Role</th>
@@ -381,7 +389,7 @@ export default function EmployeesPage() {
                   const isEditing = emp.id in editingManager;
                   const isSaving = savingManager[emp.id];
                   return (
-                    <tr key={emp.id} className="hover:bg-gray-50/60 transition-colors">
+                    <tr key={emp.id} className="hover:bg-slate-50/60 transition-colors">
                       {/* Employee */}
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3">
@@ -421,7 +429,7 @@ export default function EmployeesPage() {
                             <select
                               value={editingManager[emp.id]}
                               onChange={e => setEditingManager(s => ({ ...s, [emp.id]: e.target.value }))}
-                              className="border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-red-200 bg-white"
+                              className="border border-slate-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-red-200 bg-white"
                               autoFocus
                             >
                               <option value="__none__">— No manager —</option>
@@ -445,7 +453,7 @@ export default function EmployeesPage() {
                             <button
                               onClick={() => cancelEdit(emp.id)}
                               disabled={isSaving}
-                              className="text-xs text-gray-500 px-2 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                              className="text-xs text-gray-500 px-2 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
                             >
                               ✕
                             </button>
