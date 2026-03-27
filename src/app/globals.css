@@ -188,6 +188,14 @@ body {
   from { width: 100%; }
   to   { width: 0%;   }
 }
+@keyframes bar-slide {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@keyframes logo-breathe {
+  0%, 100% { transform: scale(1);    box-shadow: 0 8px 24px rgba(220,38,38,0.30); }
+  50%       { transform: scale(1.05); box-shadow: 0 12px 32px rgba(220,38,38,0.45); }
+}
 
 .animate-fade-in-up  { animation: fadeInUp 0.4s ease forwards; }
 .animate-fade-in     { animation: fadeIn 0.3s ease forwards; }
