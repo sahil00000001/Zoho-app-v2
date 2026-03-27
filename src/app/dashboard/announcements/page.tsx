@@ -178,6 +178,15 @@ export default function AnnouncementsPage() {
     }
   }
 
+  async function handleShare(id: string) {
+    try {
+      await api.shareAnnouncement(id);
+      showSuccessMsg('Announcement sent via email to all recipients');
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to send email');
+    }
+  }
+
   const pinnedAnn = announcements.filter(a => a.isPinned);
   const regularAnn = announcements.filter(a => !a.isPinned);
   const todayCelebrations = [
@@ -270,7 +279,7 @@ export default function AnnouncementsPage() {
               </div>
               <div className="space-y-3">
                 {pinnedAnn.map(ann => (
-                  <AnnouncementCard key={ann.id} ann={ann} canManage={canManage} onEdit={startEdit} onDelete={handleDelete} onPin={togglePin} />
+                  <AnnouncementCard key={ann.id} ann={ann} canManage={canManage} onEdit={startEdit} onDelete={handleDelete} onPin={togglePin} onShare={handleShare} />
                 ))}
               </div>
             </div>
@@ -286,7 +295,7 @@ export default function AnnouncementsPage() {
               )}
               <div className="space-y-3">
                 {regularAnn.map(ann => (
-                  <AnnouncementCard key={ann.id} ann={ann} canManage={canManage} onEdit={startEdit} onDelete={handleDelete} onPin={togglePin} />
+                  <AnnouncementCard key={ann.id} ann={ann} canManage={canManage} onEdit={startEdit} onDelete={handleDelete} onPin={togglePin} onShare={handleShare} />
                 ))}
               </div>
             </div>
@@ -477,6 +486,7 @@ export default function AnnouncementsPage() {
                   onEdit={startEdit}
                   onDelete={handleDelete}
                   onPin={togglePin}
+                  onShare={handleShare}
                   showActions
                 />
               ))
@@ -491,16 +501,18 @@ export default function AnnouncementsPage() {
 // ── Sub-components ─────────────────────────────────────────────
 
 function AnnouncementCard({
-  ann, canManage, onEdit, onDelete, onPin, showActions,
+  ann, canManage, onEdit, onDelete, onPin, onShare, showActions,
 }: {
   ann: Announcement;
   canManage: boolean;
   onEdit: (a: Announcement) => void;
   onDelete: (id: string) => void;
   onPin: (a: Announcement) => void;
+  onShare: (id: string) => void;
   showActions?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const [sharing, setSharing] = useState(false);
   const cfg = PRIORITY_CONFIG[ann.priority];
   const isExpired = ann.expiresAt && new Date(ann.expiresAt) < new Date();
   const shortContent = ann.content.length > 200;
@@ -561,6 +573,14 @@ function AnnouncementCard({
           {/* Actions */}
           {canManage && (
             <div className="flex items-center gap-1 shrink-0">
+              <button
+                onClick={async () => { setSharing(true); await onShare(ann.id); setSharing(false); }}
+                disabled={sharing}
+                className="p-1.5 rounded-lg text-gray-300 hover:text-green-500 hover:bg-green-50 transition-colors text-sm disabled:opacity-50"
+                title="Share via Email"
+              >
+                {sharing ? <span className="inline-block w-4 h-4 border-2 border-green-400 border-t-transparent rounded-full animate-spin" /> : '📤'}
+              </button>
               <button
                 onClick={() => onPin(ann)}
                 className={`p-1.5 rounded-lg transition-colors text-sm ${ann.isPinned ? 'text-yellow-500 bg-yellow-50' : 'text-gray-300 hover:text-yellow-400 hover:bg-yellow-50'}`}

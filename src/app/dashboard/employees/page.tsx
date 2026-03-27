@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { api } from "@/lib/api";
+import { api, CreateUserData } from "@/lib/api";
 
 interface Employee {
   id: string;
@@ -66,6 +66,12 @@ export default function EmployeesPage() {
   const [filterRole, setFilterRole] = useState("");
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
 
+  // Add employee modal
+  const [showAdd, setShowAdd] = useState(false);
+  const [addForm, setAddForm] = useState<CreateUserData>({ email: '', firstName: '', lastName: '', role: 'EMPLOYEE', designation: '', departmentId: '', phoneNumber: '' });
+  const [addLoading, setAddLoading] = useState(false);
+  const [addError, setAddError] = useState('');
+
   // Per-row manager edit state: { [employeeId]: selectedManagerId | "__editing__" }
   const [editingManager, setEditingManager] = useState<Record<string, string>>({});
   const [savingManager, setSavingManager] = useState<Record<string, boolean>>({});
@@ -113,6 +119,23 @@ export default function EmployeesPage() {
 
   function cancelEdit(employeeId: string) {
     setEditingManager(s => { const n = { ...s }; delete n[employeeId]; return n; });
+  }
+
+  async function handleAddEmployee(e: React.FormEvent) {
+    e.preventDefault();
+    setAddLoading(true);
+    setAddError('');
+    try {
+      await api.createUser(addForm);
+      showSuccess('Employee added! A welcome email has been sent to ' + addForm.email);
+      setShowAdd(false);
+      setAddForm({ email: '', firstName: '', lastName: '', role: 'EMPLOYEE', designation: '', departmentId: '', phoneNumber: '' });
+      await load();
+    } catch (err) {
+      setAddError(err instanceof Error ? err.message : 'Failed to add employee');
+    } finally {
+      setAddLoading(false);
+    }
   }
 
   // Filtered list
@@ -164,6 +187,15 @@ export default function EmployeesPage() {
           <h1 className="text-[22px] font-bold text-slate-900">Employees</h1>
           <p className="text-slate-500 text-sm mt-0.5">{employees.length} team members across {departments.length} departments</p>
         </div>
+        {canManage && (
+          <button
+            onClick={() => setShowAdd(true)}
+            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white rounded-xl shadow-lg shadow-red-500/20 hover:opacity-90 transition-all active:scale-95"
+            style={{ background: 'linear-gradient(135deg, rgb(220,38,38), rgb(249,115,22))' }}
+          >
+            + Add Employee
+          </button>
+        )}
       </div>
 
       {/* Stats */}
@@ -364,6 +396,73 @@ export default function EmployeesPage() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Add Employee Modal */}
+      {showAdd && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+              <div>
+                <h3 className="font-bold text-slate-900">Add New Employee</h3>
+                <p className="text-xs text-slate-500 mt-0.5">A welcome email with login instructions will be sent automatically</p>
+              </div>
+              <button onClick={() => { setShowAdd(false); setAddError(''); }} className="text-gray-400 hover:text-gray-600 text-xl w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100">×</button>
+            </div>
+            <form onSubmit={handleAddEmployee} className="p-6 space-y-4">
+              {addError && <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl">{addError}</div>}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">First Name *</label>
+                  <input className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all" value={addForm.firstName} onChange={e => setAddForm(f => ({ ...f, firstName: e.target.value }))} required />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Last Name *</label>
+                  <input className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all" value={addForm.lastName} onChange={e => setAddForm(f => ({ ...f, lastName: e.target.value }))} required />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Work Email *</label>
+                <input type="email" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all" value={addForm.email} onChange={e => setAddForm(f => ({ ...f, email: e.target.value }))} required />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Role *</label>
+                  <select className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all" value={addForm.role} onChange={e => setAddForm(f => ({ ...f, role: e.target.value as CreateUserData['role'] }))}>
+                    <option value="EMPLOYEE">Employee</option>
+                    <option value="MANAGER">Manager</option>
+                    <option value="HR">HR</option>
+                    <option value="ADMIN">Admin</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Department</label>
+                  <select className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all" value={addForm.departmentId || ''} onChange={e => setAddForm(f => ({ ...f, departmentId: e.target.value }))}>
+                    <option value="">No Department</option>
+                    {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Designation</label>
+                  <input className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all" value={addForm.designation || ''} onChange={e => setAddForm(f => ({ ...f, designation: e.target.value }))} />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Phone</label>
+                  <input className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all" value={addForm.phoneNumber || ''} onChange={e => setAddForm(f => ({ ...f, phoneNumber: e.target.value }))} />
+                </div>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button type="button" onClick={() => { setShowAdd(false); setAddError(''); }} className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-gray-600 hover:bg-slate-50 transition-colors">Cancel</button>
+                <button type="submit" disabled={addLoading} className="flex-1 text-white font-bold py-2.5 rounded-xl text-sm disabled:opacity-70 flex items-center justify-center gap-2" style={{ background: 'linear-gradient(90deg, rgb(220,38,38), rgb(249,115,22))' }}>
+                  {addLoading && <span className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />}
+                  {addLoading ? 'Adding...' : '✉️ Add & Send Email'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 

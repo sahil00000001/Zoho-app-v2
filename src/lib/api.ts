@@ -215,6 +215,8 @@ export const api = {
   updateAnnouncement: (id: string, data: Partial<AnnouncementData>) =>
     request(`/api/announcements/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
   deleteAnnouncement: (id: string) => request(`/api/announcements/${id}`, { method: 'DELETE' }),
+  shareAnnouncement: (id: string) =>
+    request(`/api/announcements/${id}/send`, { method: 'POST' }),
   getCelebrations: () => request('/api/announcements/celebrations'),
 
   // Onboarding
