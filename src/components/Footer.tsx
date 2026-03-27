@@ -31,7 +31,7 @@ export default function Footer() {
       {/* ── Gradient top border ── */}
       <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgb(220,38,38), rgb(249,115,22), transparent)" }} />
 
-      <div className="bg-white pt-10 pb-0">
+      <div className="bg-white pt-10 pb-0 px-5 md:px-6">
         {/* ── Main grid ── */}
         <div className={`grid grid-cols-1 sm:grid-cols-2 ${showAdmin ? "lg:grid-cols-4" : "lg:grid-cols-3"} gap-10 pb-10`}>
 

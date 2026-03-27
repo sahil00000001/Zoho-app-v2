@@ -14,11 +14,11 @@ export default function MainContainer({ children }: { children: React.ReactNode 
   }
 
   return (
-    <div className="flex-1 overflow-y-auto">
-      <div className="p-5 md:p-6 max-w-7xl mx-auto flex flex-col min-h-full">
-        <div className="flex-1">{children}</div>
-        <Footer />
+    <div className="flex-1 overflow-y-auto flex flex-col">
+      <div className="p-5 md:p-6 max-w-7xl mx-auto w-full flex-1">
+        {children}
       </div>
+      <Footer />
     </div>
   );
 }
