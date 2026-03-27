@@ -7,6 +7,7 @@ interface AuthContextType {
   permissions: MyPermissions | null;
   loading: boolean;
   login: (email: string, otp: string) => Promise<void>;
+  loginWithTokens: (accessToken: string, refreshToken: string) => Promise<void>;
   logout: () => Promise<void>;
   isRole: (...roles: string[]) => boolean;
   canAccess: (module: string) => boolean;
@@ -104,6 +105,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {}
   }, []);
 
+  const loginWithTokens = useCallback(async (accessToken: string, refreshToken: string) => {
+    api.setTokens(accessToken, refreshToken);
+    const [u, perms] = await Promise.all([
+      api.getMe(),
+      api.getMyPermissions().catch(() => null),
+    ]);
+    localStorage.setItem('user', JSON.stringify(u));
+    setUser(u);
+    if (perms) {
+      setPermissions(perms);
+      localStorage.setItem('permissions', JSON.stringify(perms));
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     await api.logout();
     localStorage.removeItem('permissions');
@@ -135,7 +150,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user, permissions]);
 
   return (
-    <AuthContext.Provider value={{ user, permissions, loading, login, logout, isRole, canAccess, refreshPermissions }}>
+    <AuthContext.Provider value={{ user, permissions, loading, login, loginWithTokens, logout, isRole, canAccess, refreshPermissions }}>
       {children}
     </AuthContext.Provider>
   );
