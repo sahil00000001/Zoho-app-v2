@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import { useAuth } from "@/contexts/AuthContext";
 
 const QUICK_LINKS = [
   { href: "/dashboard",               label: "Dashboard",     icon: "⊞" },
@@ -11,20 +10,9 @@ const QUICK_LINKS = [
   { href: "/dashboard/profile",       label: "My Profile",    icon: "👤" },
 ];
 
-const ADMIN_LINKS = [
-  { href: "/dashboard/employees",  label: "Employees",          icon: "🧑‍💼" },
-  { href: "/dashboard/org-chart",  label: "Org Chart",          icon: "🌳" },
-  { href: "/dashboard/onboarding", label: "Onboarding",         icon: "🚀" },
-  { href: "/dashboard/users",      label: "User Management",    icon: "⚙️" },
-  { href: "/dashboard/roles",      label: "Roles & Permissions",icon: "🔑" },
-  { href: "/dashboard/audit",      label: "Audit Logs",         icon: "📋" },
-];
-
 const year = new Date().getFullYear();
 
 export default function Footer() {
-  const { isRole } = useAuth();
-  const showAdmin = isRole("HR", "ADMIN");
 
   return (
     <footer className="mt-12">
@@ -33,7 +21,7 @@ export default function Footer() {
 
       <div className="bg-white pt-10 pb-0 px-5 md:px-6">
         {/* ── Main grid ── */}
-        <div className={`grid grid-cols-1 sm:grid-cols-2 ${showAdmin ? "lg:grid-cols-4" : "lg:grid-cols-3"} gap-10 pb-10`}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 pb-10">
 
           {/* ── Brand column ── */}
           <div className="sm:col-span-2 lg:col-span-1">
@@ -78,28 +66,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* ── Management (HR + Admin only) ── */}
-          {showAdmin && (
-            <div>
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                <span className="w-3 h-0.5 rounded-full inline-block" style={{ background: "linear-gradient(90deg, rgb(220,38,38), rgb(249,115,22))" }} />
-                Management
-              </p>
-              <ul className="space-y-1">
-                {ADMIN_LINKS.map((l) => (
-                  <li key={l.href}>
-                    <Link
-                      href={l.href}
-                      className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs text-gray-500 font-medium hover:bg-red-50 hover:text-red-600 transition-all group"
-                    >
-                      <span className="text-sm w-5 text-center group-hover:scale-110 transition-transform inline-block">{l.icon}</span>
-                      {l.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
 
           {/* ── Support & Info ── */}
           <div>
