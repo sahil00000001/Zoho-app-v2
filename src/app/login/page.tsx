@@ -155,15 +155,6 @@ export default function LoginPage() {
                 </li>
               ))}
             </ul>
-            {/* Social proof */}
-            <div className="mt-12 flex items-center gap-3">
-              <div className="flex -space-x-2">
-                {["SC","MW","PN","AK"].map((a,i) => (
-                  <div key={i} className="w-8 h-8 rounded-full bg-white/30 border-2 border-white flex items-center justify-center text-white text-[10px] font-bold">{a}</div>
-                ))}
-              </div>
-              <p className="text-white/70 text-sm">Trusted by modern teams</p>
-            </div>
           </div>
         </section>
 
