@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ATLAS HR — Platform Presentation</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red:    rgb(220, 38, 38);
+    --orange: rgb(249, 115, 22);
+    --grad:   linear-gradient(135deg, rgb(220,38,38), rgb(249,115,22));
+    --grad-h: linear-gradient(135deg, rgb(200,28,28), rgb(230,95,10));
+    --dark:   #0f172a;
+    --slate:  #1e293b;
+    --muted:  #94a3b8;
+    --light:  #f8fafc;
+    --border: rgba(255,255,255,0.1);
+  }
+
+  html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--dark); color: #fff; }
+
+  /* ── Slide container ── */
+  #deck { position: relative; width: 100vw; height: 100vh; }
+
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 60px 80px;
+    opacity: 0; transform: translateX(60px);
+    transition: opacity 0.45s cubic-bezier(.4,0,.2,1), transform 0.45s cubic-bezier(.4,0,.2,1);
+    pointer-events: none;
+  }
+  .slide.active  { opacity: 1; transform: translateX(0); pointer-events: all; }
+  .slide.exiting { opacity: 0; transform: translateX(-60px); }
+
+  /* ── Backgrounds ── */
+  .bg-dark    { background: var(--dark); }
+  .bg-slate   { background: var(--slate); }
+  .bg-hero    { background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #1c1017 100%); }
+  .bg-deep    { background: linear-gradient(135deg, #0c1a2e 0%, #14213d 100%); }
+
+  /* ── Decoration blob ── */
+  .blob {
+    position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.18;
+  }
+
+  /* ── Typography ── */
+  .tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 99px;
+    background: rgba(220,38,38,0.15); color: var(--orange); border: 1px solid rgba(249,115,22,0.25);
+    margin-bottom: 20px;
+  }
+  h1 { font-size: clamp(2.4rem, 5vw, 3.6rem); font-weight: 900; line-height: 1.1; letter-spacing: -.02em; }
+  h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; line-height: 1.2; }
+  h3 { font-size: 1.1rem; font-weight: 700; }
+  .grad-text {
+    background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .sub { color: var(--muted); font-size: 1.05rem; line-height: 1.6; max-width: 620px; text-align: center; margin-top: 14px; }
+  .sub-left { color: var(--muted); font-size: 0.95rem; line-height: 1.7; max-width: 680px; margin-top: 10px; }
+
+  /* ── Cards ── */
+  .card {
+    background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px 28px;
+    backdrop-filter: blur(4px);
+  }
+  .card-sm { padding: 16px 20px; border-radius: 12px; }
+  .card-accent { border-color: rgba(220,38,38,0.3); background: rgba(220,38,38,0.06); }
+
+  /* ── Grid layouts ── */
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; max-width: 960px; }
+  .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; width: 100%; max-width: 1000px; }
+  .g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; width: 100%; max-width: 1020px; }
+
+  /* ── Pill badges ── */
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 99px;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+  }
+  .pill-red    { background: rgba(220,38,38,0.15); border-color: rgba(220,38,38,0.3); color: #fca5a5; }
+  .pill-orange { background: rgba(249,115,22,0.15); border-color: rgba(249,115,22,0.3); color: #fdba74; }
+  .pill-blue   { background: rgba(59,130,246,0.12); border-color: rgba(59,130,246,0.25); color: #93c5fd; }
+  .pill-green  { background: rgba(34,197,94,0.12);  border-color: rgba(34,197,94,0.25);  color: #86efac; }
+  .pill-purple { background: rgba(139,92,246,0.12); border-color: rgba(139,92,246,0.25); color: #c4b5fd; }
+
+  /* ── Icon circle ── */
+  .icon-circle {
+    width: 48px; height: 48px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; background: rgba(255,255,255,0.07); margin-bottom: 12px; flex-shrink: 0;
+  }
+  .icon-circle.grad { background: var(--grad); }
+
+  /* ── Flow step ── */
+  .flow-step {
+    display: flex; align-items: center; gap: 0;
+  }
+  .step-box {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px 18px; min-width: 120px; text-align: center;
+  }
+  .step-arrow { color: var(--muted); font-size: 1.4rem; padding: 0 8px; flex-shrink: 0; }
+
+  /* ── Bullet list ── */
+  .blist { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .blist li { display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; color: #cbd5e1; }
+  .blist li::before { content: ""; display: block; width: 6px; height: 6px; border-radius: 50%; background: var(--grad); flex-shrink: 0; margin-top: 6px; }
+
+  /* ── Progress bar ── */
+  #progress {
+    position: fixed; bottom: 0; left: 0; height: 3px;
+    background: var(--grad); transition: width 0.4s ease; z-index: 100;
+  }
+
+  /* ── Navigation ── */
+  #nav {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 12px; z-index: 100;
+  }
+  .nav-btn {
+    width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.07); color: #fff; font-size: 1rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; backdrop-filter: blur(8px);
+  }
+  .nav-btn:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.3); }
+  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  #slide-num { font-size: 12px; color: var(--muted); font-weight: 600; min-width: 48px; text-align: center; }
+
+  /* ── Slide dots ── */
+  #dots {
+    position: fixed; right: 28px; top: 50%; transform: translateY(-50%);
+    display: flex; flex-direction: column; gap: 8px; z-index: 100;
+  }
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: rgba(255,255,255,0.2); cursor: pointer; transition: all 0.25s;
+  }
+  .dot.active { background: var(--red); transform: scale(1.4); }
+
+  /* ── Divider ── */
+  .divider { height: 1px; background: var(--border); width: 100%; margin: 10px 0; }
+
+  /* ── Tech stack badge ── */
+  .tech-badge {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px; padding: 18px 16px; min-width: 100px; text-align: center;
+  }
+  .tech-badge .tech-icon { font-size: 1.8rem; }
+  .tech-badge .tech-name { font-size: 11px; font-weight: 700; color: #94a3b8; letter-spacing: .06em; text-transform: uppercase; }
+
+  /* ── Roadmap item ── */
+  .road-item {
+    display: flex; align-items: flex-start; gap: 14px;
+    background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 18px;
+  }
+  .road-num {
+    width: 28px; height: 28px; border-radius: 8px; background: var(--grad);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800; flex-shrink: 0;
+  }
+
+  /* ── Role row ── */
+  .role-row {
+    display: flex; align-items: flex-start; gap: 16px;
+    padding: 16px 20px; border-radius: 12px;
+    background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  }
+
+  /* ── Cover logo ── */
+  .cover-logo {
+    width: 72px; height: 72px; border-radius: 20px; background: var(--grad);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; font-weight: 900; color: #fff; margin-bottom: 28px;
+    box-shadow: 0 20px 60px rgba(220,38,38,0.4);
+  }
+
+  .w-full  { width: 100%; }
+  .mw960   { max-width: 960px; }
+  .mw800   { max-width: 800px; }
+  .mt8     { margin-top: 8px; }
+  .mt14    { margin-top: 14px; }
+  .mt20    { margin-top: 20px; }
+  .mt28    { margin-top: 28px; }
+  .mt36    { margin-top: 36px; }
+  .flex    { display: flex; }
+  .gap8    { gap: 8px; }
+  .gap12   { gap: 12px; }
+  .gap16   { gap: 16px; }
+  .gap20   { gap: 20px; }
+  .gap28   { gap: 28px; }
+  .fcol    { flex-direction: column; }
+  .fwrap   { flex-wrap: wrap; }
+  .acenter { align-items: center; }
+  .jcenter { justify-content: center; }
+  .c-muted { color: var(--muted); }
+  .fs11    { font-size: 11px; }
+  .fs13    { font-size: 13px; }
+  .fs14    { font-size: 14px; }
+  .fw600   { font-weight: 600; }
+  .fw700   { font-weight: 700; }
+  .lh16    { line-height: 1.6; }
+
+  @media (max-width: 900px) {
+    .slide { padding: 40px 30px; }
+    .g3, .g4 { grid-template-columns: 1fr 1fr; }
+    .g2 { grid-template-columns: 1fr; }
+    h1 { font-size: 2.2rem; }
+    h2 { font-size: 1.6rem; }
+    .flow-step { flex-wrap: wrap; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<div id="deck">
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 1 — COVER                                         -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="slide active bg-hero">
+    <div class="blob" style="width:500px;height:500px;background:rgb(220,38,38);top:-100px;right:-100px;"></div>
+    <div class="blob" style="width:350px;height:350px;background:rgb(249,115,22);bottom:-80px;left:-80px;"></div>
+    <div class="cover-logo">P</div>
+    <div class="tag">HR Technology Platform</div>
+    <h1 style="text-align:center;">ATLAS HR<br><span class="grad-text">Workforce OS</span></h1>
+    <p class="sub">A complete, role-based HR &amp; attendance management platform built for modern teams — from check-in to compliance.</p>
+    <div class="flex gap12 fwrap jcenter mt28">
+      <span class="pill pill-red">Next.js 16</span>
+      <span class="pill pill-orange">Express.js</span>
+      <span class="pill pill-blue">PostgreSQL</span>
+      <span class="pill pill-green">Prisma ORM</span>
+      <span class="pill pill-purple">Vercel</span>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 2 — PROBLEM                                       -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="slide bg-dark">
+    <div class="blob" style="width:300px;height:300px;background:rgb(220,38,38);top:10%;left:-60px;"></div>
+    <div class="tag">The Problem</div>
+    <h2>HR operations are <span class="grad-text">scattered &amp; manual</span></h2>
+    <div class="g3 mt36">
+      <div class="card fcol">
+        <div class="icon-circle">📋</div>
+        <h3>No Attendance System</h3>
+        <p class="fs13 c-muted mt8 lh16">Manual registers, spreadsheets, and WhatsApp screenshots — zero audit trail or real-time visibility.</p>
+      </div>
+      <div class="card fcol">
+        <div class="icon-circle">📩</div>
+        <h3>Leave Via Email/Chat</h3>
+        <p class="fs13 c-muted mt8 lh16">Leave requests over email or WhatsApp. Approvals get lost. No balance tracking. No history.</p>
+      </div>
+      <div class="card fcol">
+        <div class="icon-circle">🔒</div>
+        <h3>No Role Separation</h3>
+        <p class="fs13 c-muted mt8 lh16">Everyone sees everything or nothing. No manager vs HR vs employee access boundaries.</p>
+      </div>
+    </div>
+    <div class="g3 mt20">
+      <div class="card fcol">
+        <div class="icon-circle">🗂️</div>
+        <h3>Employee Data in Silos</h3>
+        <p class="fs13 c-muted mt8 lh16">No single source of truth. Profiles in HR sheets, skills in emails, docs in Google Drive.</p>
+      </div>
+      <div class="card fcol">
+        <div class="icon-circle">📊</div>
+        <h3>Zero HR Analytics</h3>
+        <p class="fs13 c-muted mt8 lh16">Can't see who's present today, who's on leave, pending approvals, or team size at a glance.</p>
+      </div>
+      <div class="card fcol">
+        <div class="icon-circle">🚀</div>
+        <h3>Slow Onboarding</h3>
+        <p class="fs13 c-muted mt8 lh16">No structured onboarding checklist. Asset assignment, IT provisioning, and tasks are ad-hoc.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 3 — SOLUTION / OVERVIEW                           -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="slide bg-hero">
+    <div class="blob" style="width:400px;height:400px;background:rgb(249,115,22);bottom:0;right:-60px;"></div>
+    <div class="tag">The Solution</div>
+    <h2>One platform. <span class="grad-text">Every HR workflow.</span></h2>
+    <p class="sub mt14">ATLAS HR replaces scattered tools with a single, role-aware platform that gives each person exactly what they need.</p>
+    <div class="g4 mt36">
+      <div class="card card-sm fcol acenter" style="text-align:center;">
+        <div style="font-size:1.6rem">🕐</div>
+        <div class="fw700 mt8">Attendance</div>
+        <div class="fs11 c-muted mt8">Check-in/out, WFH, overtime auto-calc</div>
+      </div>
+      <div class="card card-sm fcol acenter" style="text-align:center;">
+        <div style="font-size:1.6rem">🌿</div>
+        <div class="fw700 mt8">Leave Mgmt</div>
+        <div class="fs11 c-muted mt8">Apply, approve, balance tracking</div>
+      </div>
+      <div class="card card-sm fcol acenter" style="text-align:center;">
+        <div style="font-size:1.6rem">✅</div>
+        <div class="fw700 mt8">Approvals</div>
+        <div class="fs11 c-muted mt8">Manager review with reject notes</div>
+      </div>
+      <div class="card card-sm fcol acenter" style="text-align:center;">
+        <div style="font-size:1.6rem">📢</div>
+        <div class="fw700 mt8">Announcements</div>
+        <div class="fs11 c-muted mt8">Company + dept notices, pinning</div>
+      </div>
+      <div class="card card-sm fcol acenter" style="text-align:center;">
+        <div style="font-size:1.6rem">👤</div>
+        <div class="fw700 mt8">Profiles</div>
+        <div class="fs11 c-muted mt8">Skills, certs, KRA documents</div>
+      </div>
+      <div class="card card-sm fcol acenter" style="text-align:center;">
+        <div style="font-size:1.6rem">🌳</div>
+        <div class="fw700 mt8">Org Chart</div>
+        <div class="fs11 c-muted mt8">Visual hierarchy, manager assign</div>
+      </div>
+      <div class="card card-sm fcol acenter" style="text-align:center;">
+        <div style="font-size:1.6rem">🚀</div>
+        <div class="fw700 mt8">Onboarding</div>
+        <div class="fs11 c-muted mt8">Task checklists, asset &amp; IT tracking</div>
+      </div>
+      <div class="card card-sm fcol acenter" style="text-align:center;">
+        <div style="font-size:1.6rem">📊</div>
+        <div class="fw700 mt8">Dashboard</div>
+        <div class="fs11 c-muted mt8">Real-time stats, activity feed</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 4 — TECH ARCHITECTURE                             -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="slide bg-slate">
+    <div class="blob" style="width:300px;height:300px;background:rgb(59,130,246);top:-60px;right:10%;"></div>
+    <div class="tag">Architecture</div>
+    <h2>Modern, <span class="grad-text">production-grade</span> stack</h2>
+    <div class="g2 mt36 mw960">
+      <div class="card">
+        <div class="flex acenter gap12 mb" style="margin-bottom:16px;">
+          <div class="icon-circle grad" style="margin-bottom:0">🖥️</div>
+          <div>
+            <div class="fw700">Frontend</div>
+            <div class="fs11 c-muted">User interface layer</div>
+          </div>
+        </div>
+        <div class="flex gap8 fwrap">
+          <span class="tech-badge"><span class="tech-icon">⚛️</span><span class="tech-name">Next.js 16</span></span>
+          <span class="tech-badge"><span class="tech-icon">🔷</span><span class="tech-name">TypeScript</span></span>
+          <span class="tech-badge"><span class="tech-icon">🎨</span><span class="tech-name">Tailwind v4</span></span>
+          <span class="tech-badge"><span class="tech-icon">🚀</span><span class="tech-name">Vercel</span></span>
+        </div>
+        <div class="divider mt14"></div>
+        <ul class="blist mt14">
+          <li>App Router with server-side rendering</li>
+          <li>60s in-memory API cache + in-flight deduplication</li>
+          <li>Role-based route guards &amp; module access control</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="flex acenter gap12" style="margin-bottom:16px;">
+          <div class="icon-circle grad" style="margin-bottom:0">⚙️</div>
+          <div>
+            <div class="fw700">Backend</div>
+            <div class="fs11 c-muted">API + business logic layer</div>
+          </div>
+        </div>
+        <div class="flex gap8 fwrap">
+          <span class="tech-badge"><span class="tech-icon">🟩</span><span class="tech-name">Node.js</span></span>
+          <span class="tech-badge"><span class="tech-icon">🛤️</span><span class="tech-name">Express.js</span></span>
+          <span class="tech-badge"><span class="tech-icon">🔺</span><span class="tech-name">Prisma ORM</span></span>
+          <span class="tech-badge"><span class="tech-icon">🐘</span><span class="tech-name">PostgreSQL</span></span>
+        </div>
+        <div class="divider mt14"></div>
+        <ul class="blist mt14">
+          <li>JWT access + refresh token auth (OTP login)</li>
+          <li>Role middleware: EMPLOYEE → MANAGER → HR → ADMIN</li>
+          <li>Full audit log on every sensitive action</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card mt20 mw960 w-full" style="padding:16px 24px;">
+      <div class="flex acenter gap16 fwrap">
+        <span class="fw700 fs13">Hosting &amp; DB:</span>
+        <span class="pill pill-blue">Vercel Serverless (Frontend + API)</span>
+        <span class="pill pill-green">Supabase PostgreSQL</span>
+        <span class="pill pill-purple">Optimized with 12 DB indexes</span>
+        <span class="pill pill-orange">4-min keepalive to prevent cold starts</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 5 — USER ROLES                                    -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="slide bg-dark">
+    <div class="blob" style="width:280px;height:280px;background:rgb(139,92,246);bottom:5%;left:-40px;"></div>
+    <div class="tag">Access Control</div>
+    <h2>Four roles, <span class="grad-text">precisely scoped</span></h2>
+    <div class="flex fcol gap12 mt36 mw800 w-full">
+      <div class="role-row">
+        <div style="width:42px;height:42px;border-radius:12px;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">👤</div>
+        <div class="flex-1">
+          <div class="flex acenter gap12 fwrap"><span class="fw700">Employee</span><span class="pill pill-green" style="font-size:10px;">Base</span></div>
+          <div class="fs13 c-muted mt8">Check in/out · Apply &amp; track leaves · View announcements · Manage own profile · Submit attendance corrections</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div style="width:42px;height:42px;border-radius:12px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">👥</div>
+        <div class="flex-1">
+          <div class="flex acenter gap12 fwrap"><span class="fw700">Manager</span><span class="pill pill-blue" style="font-size:10px;">+ Team Access</span></div>
+          <div class="fs13 c-muted mt8">All Employee access · Approve/reject team leave requests with notes · View team attendance · Dashboard team stats</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div style="width:42px;height:42px;border-radius:12px;background:rgba(249,115,22,0.15);border:1px solid rgba(249,115,22,0.3);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">🏢</div>
+        <div class="flex-1">
+          <div class="flex acenter gap12 fwrap"><span class="fw700">HR</span><span class="pill pill-orange" style="font-size:10px;">+ Org Access</span></div>
+          <div class="fs13 c-muted mt8">All Manager access · Post announcements · View all employees · Manage onboarding · Access audit logs · Org-wide leave visibility</div>
+        </div>
+      </div>
+      <div class="role-row" style="border-color:rgba(220,38,38,0.3);background:rgba(220,38,38,0.05);">
+        <div style="width:42px;height:42px;border-radius:12px;background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.3);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">⚙️</div>
+        <div class="flex-1">
+          <div class="flex acenter gap12 fwrap"><span class="fw700">Admin</span><span class="pill pill-red" style="font-size:10px;">Full Control</span></div>
+          <div class="fs13 c-muted mt8">All HR access · Create/manage users · Assign managers · Configure custom roles &amp; permissions · View full audit trail · System settings</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 6 — AUTH FLOW                                     -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="slide bg-slate">
+    <div class="tag">Security</div>
+    <h2>Passwordless <span class="grad-text">OTP Login</span></h2>
+    <p class="sub mt14">No passwords to remember or leak. Secure one-time codes sent to verified work emails.</p>
+    <div class="flow-step mt36 gap12 fwrap jcenter w-full" style="max-width:860px;">
+      <div class="step-box">
+        <div style="font-size:1.6rem">📧</div>
+        <div class="fw700 fs13">Enter Email</div>
+        <div class="fs11 c-muted mt8">Work email only</div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step-box">
+        <div style="font-size:1.6rem">📨</div>
+        <div class="fw700 fs13">OTP Sent</div>
+        <div class="fs11 c-muted mt8">6-digit code, 5 min TTL</div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step-box">
+        <div style="font-size:1.6rem">🔑</div>
+        <div class="fw700 fs13">Verify OTP</div>
+        <div class="fs11 c-muted mt8">Single-use, server-verified</div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step-box">
+        <div style="font-size:1.6rem">🪙</div>
+        <div class="fw700 fs13">JWT Issued</div>
+        <div class="fs11 c-muted mt8">Access + Refresh token</div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step-box" style="border-color:rgba(220,38,38,0.4);">
+        <div style="font-size:1.6rem">🏠</div>
+        <div class="fw700 fs13">Dashboard</div>
+        <div class="fs11 c-muted mt8">Role-aware view</div>
+      </div>
+    </div>
+    <div class="g2 mt28 mw800 w-full">
+      <div class="card card-sm">
+        <div class="fw700 mb" style="margin-bottom:10px;">🔐 Token Strategy</div>
+        <ul class="blist">
+          <li>Short-lived access token (JWT, 15 min)</li>
+          <li>Long-lived refresh token (7 days, rotated)</li>
+          <li>Auto-refresh on 401 — seamless UX</li>
+        </ul>
+      </div>
+      <div class="card card-sm">
+        <div class="fw700 mb" style="margin-bottom:10px;">🛡️ Every Request</div>
+        <ul class="blist">
+          <li>Bearer token validated on every API call</li>
+          <li>Role &amp; permission checked per endpoint</li>
+          <li>All sensitive actions written to Audit Log</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 7 — ATTENDANCE FLOW                               -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="slide bg-dark">
+    <div class="blob" style="width:300px;height:300px;background:rgb(220,38,38);top:5%;right:-40px;"></div>
+    <div class="tag">Module · Attendance</div>
+    <h2>Smart attendance, <span class="grad-text">zero friction</span></h2>
+    <div class="flow-step mt28 gap8 fwrap jcenter w-full" style="max-width:920px;">
+      <div class="step-box">
+        <div style="font-size:1.4rem">🏢 / 🏠</div>
+        <div class="fw700 fs13">Office / WFH</div>
+        <div class="fs11 c-muted mt8">Toggle before check-in</div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step-box" style="border-color:rgba(34,197,94,0.4);">
+        <div style="font-size:1.4rem">✅</div>
+        <div class="fw700 fs13">Check In</div>
+        <div class="fs11 c-muted mt8">Timestamp + location</div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step-box">
+        <div style="font-size:1.4rem">⏱️</div>
+        <div class="fw700 fs13">Working</div>
+        <div class="fs11 c-muted mt8">Live timer shown</div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step-box" style="border-color:rgba(220,38,38,0.4);">
+        <div style="font-size:1.4rem">🔚</div>
+        <div class="fw700 fs13">Check Out</div>
+        <div class="fs11 c-muted mt8">Work hours auto-calc</div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step-box">
+        <div style="font-size:1.4rem">📈</div>
+        <div class="fw700 fs13">Record Saved</div>
+        <div class="fs11 c-muted mt8">Overtime flagged if &gt;9h</div>
+      </div>
+    </div>
+    <div class="g3 mt28 mw960 w-full">
+      <div class="card card-sm">
+        <div class="fw700 fs13 mb" style="margin-bottom:8px;">📅 My Attendance</div>
+        <ul class="blist">
+          <li>Today's card: check-in time, hours, overtime</li>
+          <li>30-day history list</li>
+          <li>Monthly calendar heatmap</li>
+        </ul>
+      </div>
+      <div class="card card-sm">
+        <div class="fw700 fs13 mb" style="margin-bottom:8px;">🔧 Regularization</div>
+        <ul class="blist">
+          <li>Request correction for missed punch</li>
+          <li>Manager reviews with notes</li>
+          <li>Approve / Reject workflow</li>
+        </ul>
+      </div>
+      <div class="card card-sm">
+        <div class="fw700 fs13 mb" style="margin-bottom:8px;">👥 Team View</div>
+        <ul class="blist">
+          <li>All employees — present, absent, WFH, late</li>
+          <li>Date picker + status filter</li>
+          <li>Cards &amp; table toggle</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 8 — LEAVE FLOW                                    -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="slide bg-slate">
+    <div class="blob" style="width:260px;height:260px;background:rgb(34,197,94);bottom:5%;right:5%;"></div>
+    <div class="tag">Module · Leaves</div>
+    <h2>End-to-end <span class="grad-text">leave management</span></h2>
+    <div class="g2 mt28 mw960 w-full">
+      <div>
+        <div class="flow-step gap8 fcol">
+          <div class="step-box" style="min-width:unset;width:100%;flex-direction:row;text-align:left;gap:14px;">
+            <div style="font-size:1.3rem">📝</div>
+            <div><div class="fw700 fs13">Employee Applies</div><div class="fs11 c-muted mt8">Select type, dates, reason · See remaining balance</div></div>
+          </div>
+          <div style="text-align:center;color:var(--muted);font-size:1.2rem;">↓</div>
+          <div class="step-box" style="min-width:unset;width:100%;flex-direction:row;text-align:left;gap:14px;border-color:rgba(249,115,22,0.35);">
+            <div style="font-size:1.3rem">⏳</div>
+            <div><div class="fw700 fs13">Pending · Manager Notified</div><div class="fs11 c-muted mt8">Notification bell badge in TopBar</div></div>
+          </div>
+          <div style="text-align:center;color:var(--muted);font-size:1.2rem;">↓</div>
+          <div class="step-box" style="min-width:unset;width:100%;flex-direction:row;text-align:left;gap:14px;border-color:rgba(34,197,94,0.35);">
+            <div style="font-size:1.3rem">✅</div>
+            <div><div class="fw700 fs13">Approved / Rejected</div><div class="fs11 c-muted mt8">Manager can add rejection reason</div></div>
+          </div>
+          <div style="text-align:center;color:var(--muted);font-size:1.2rem;">↓</div>
+          <div class="step-box" style="min-width:unset;width:100%;flex-direction:row;text-align:left;gap:14px;">
+            <div style="font-size:1.3rem">📊</div>
+            <div><div class="fw700 fs13">Balance Updated</div><div class="fs11 c-muted mt8">Auto-recalculates remaining days for the year</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="flex fcol gap16">
+        <div class="card card-sm">
+          <div class="fw700 fs13 mb" style="margin-bottom:10px;">📋 Leave Types</div>
+          <div class="fs13 c-muted lh16">Casual · Sick · Annual · Comp-Off · Custom — each with its own max-day allocation.</div>
+        </div>
+        <div class="card card-sm">
+          <div class="fw700 fs13 mb" style="margin-bottom:10px;">🗓️ Team Calendar</div>
+          <div class="fs13 c-muted lh16">Visual month calendar showing all approved/pending team leaves — plan resources at a glance.</div>
+        </div>
+        <div class="card card-sm">
+          <div class="fw700 fs13 mb" style="margin-bottom:10px;">🔄 Comp-Off</div>
+          <div class="fs13 c-muted lh16">Employees earn comp-offs for working on weekends/holidays. Separate approval + expiry tracking.</div>
+        </div>
+        <div class="card card-sm">
+          <div class="fw700 fs13 mb" style="margin-bottom:10px;">🚫 Smart Validation</div>
+          <div class="fs13 c-muted lh16">Overlap detection prevents double-booking the same date range automatically.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 9 — DASHBOARD & ACTIVITY                          -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="slide bg-dark">
+    <div class="blob" style="width:320px;height:320px;background:rgb(220,38,38);bottom:-60px;left:-60px;"></div>
+    <div class="tag">Module · Dashboard</div>
+    <h2>Real-time <span class="grad-text">role-aware dashboard</span></h2>
+    <div class="g3 mt28 mw960 w-full">
+      <div class="card">
+        <div class="fw700 mb" style="margin-bottom:12px;">👤 Employee sees</div>
+        <ul class="blist">
+          <li>Leaves used this year</li>
+          <li>Pending approval requests</li>
+          <li>Quick action tiles</li>
+          <li>Own recent activity feed</li>
+        </ul>
+      </div>
+      <div class="card" style="border-color:rgba(59,130,246,0.3);">
+        <div class="fw700 mb" style="margin-bottom:12px;">👥 Manager sees</div>
+        <ul class="blist">
+          <li>Team size &amp; present today</li>
+          <li>Team on leave count</li>
+          <li>Pending approvals (urgent)</li>
+          <li>Team activity feed</li>
+        </ul>
+      </div>
+      <div class="card" style="border-color:rgba(220,38,38,0.3);">
+        <div class="fw700 mb" style="margin-bottom:12px;">⚙️ Admin / HR sees</div>
+        <ul class="blist">
+          <li>Total headcount &amp; present %</li>
+          <li>Org-wide on leave today</li>
+          <li>All pending approvals</li>
+          <li>Org activity: joins, manager changes, all leaves</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card mt20 mw960 w-full" style="padding:18px 24px;">
+      <div class="fw700 mb" style="margin-bottom:12px;">📰 Activity Feed — 5 live sources</div>
+      <div class="flex gap12 fwrap">
+        <span class="pill">🌿 Leave updates</span>
+        <span class="pill">📢 New announcements</span>
+        <span class="pill">🔧 Regularization requests</span>
+        <span class="pill">👥 Manager assignments</span>
+        <span class="pill">🎉 New employee joins</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 10 — EMPLOYEE DIRECTORY & ORG CHART               -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="slide bg-slate">
+    <div class="blob" style="width:280px;height:280px;background:rgb(139,92,246);top:5%;right:-40px;"></div>
+    <div class="tag">Modules · Directory &amp; Org</div>
+    <h2>People data, <span class="grad-text">always in order</span></h2>
+    <div class="g2 mt36 mw960 w-full">
+      <div class="card">
+        <div class="flex acenter gap12" style="margin-bottom:16px;">
+          <div class="icon-circle" style="margin-bottom:0;font-size:1.3rem;">👥</div>
+          <div><div class="fw700">Employee Directory</div><div class="fs11 c-muted">Admin + HR only</div></div>
+        </div>
+        <ul class="blist">
+          <li>All employees in cards or table view</li>
+          <li>Filter by role, department</li>
+          <li>Search by name, ID, email, designation</li>
+          <li>Stats bar: total, by role breakdown</li>
+          <li><strong>Admin:</strong> inline manager assignment per employee</li>
+          <li>Links to full profile view</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="flex acenter gap12" style="margin-bottom:16px;">
+          <div class="icon-circle" style="margin-bottom:0;font-size:1.3rem;">🌳</div>
+          <div><div class="fw700">Org Chart</div><div class="fs11 c-muted">Visual hierarchy — all roles</div></div>
+        </div>
+        <ul class="blist">
+          <li>Tree view of the full company hierarchy</li>
+          <li>Expand/collapse branches</li>
+          <li>Admin: drag-and-drop manager reassignment</li>
+          <li>Bulk assign managers for new hires</li>
+          <li>Every change logged to audit trail</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card mt20 mw960 w-full card-sm">
+      <div class="fw700 fs13 mb" style="margin-bottom:8px;">👤 Employee Profile</div>
+      <div class="flex gap12 fwrap">
+        <span class="pill">Personal info</span>
+        <span class="pill">Skills &amp; levels</span>
+        <span class="pill">Certifications</span>
+        <span class="pill">KRA documents</span>
+        <span class="pill">Emergency contact</span>
+        <span class="pill">Manager &amp; department</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 11 — ONBOARDING & ANNOUNCEMENTS                   -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="slide bg-dark">
+    <div class="tag">Modules · Onboarding &amp; Comms</div>
+    <h2>From day one to <span class="grad-text">day-to-day</span></h2>
+    <div class="g2 mt36 mw960 w-full">
+      <div class="card">
+        <div class="flex acenter gap12" style="margin-bottom:16px;">
+          <div class="icon-circle" style="margin-bottom:0;font-size:1.3rem;">🚀</div>
+          <div><div class="fw700">Structured Onboarding</div><div class="fs11 c-muted">HR + Admin managed</div></div>
+        </div>
+        <ul class="blist">
+          <li>Task checklist per new hire (with due days)</li>
+          <li>Categorised tasks: IT, Legal, Training, Admin</li>
+          <li>Status: Pending → In Progress → Done</li>
+          <li>Asset assignment: Laptop, Card, Monitor…</li>
+          <li>IT provisioning: Email, Slack, Tools access</li>
+          <li>Progress visible to HR at all times</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="flex acenter gap12" style="margin-bottom:16px;">
+          <div class="icon-circle" style="margin-bottom:0;font-size:1.3rem;">📢</div>
+          <div><div class="fw700">Announcements</div><div class="fs11 c-muted">HR + Manager can post</div></div>
+        </div>
+        <ul class="blist">
+          <li>Company-wide or department-targeted posts</li>
+          <li>Priority levels: High 🔴, Normal, Low</li>
+          <li>Pin important notices to the top</li>
+          <li>Expiry date — auto-archive old notices</li>
+          <li>🎂 Birthday &amp; 🏅 work anniversary feed</li>
+          <li>Upcoming celebrations in next 7 days</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card mt20 mw960 w-full card-sm">
+      <div class="fw700 fs13 mb" style="margin-bottom:8px;">🔑 Admin Controls</div>
+      <div class="flex gap12 fwrap">
+        <span class="pill pill-red">Custom Roles &amp; Permissions</span>
+        <span class="pill">User management (create, deactivate)</span>
+        <span class="pill">Leave type configuration</span>
+        <span class="pill">Public holiday setup</span>
+        <span class="pill">Full audit log viewer</span>
+        <span class="pill">Error log viewer</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 12 — PERFORMANCE OPTIMIZATIONS                    -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="slide bg-slate">
+    <div class="blob" style="width:260px;height:260px;background:rgb(34,197,94);top:5%;left:-40px;"></div>
+    <div class="tag">Engineering</div>
+    <h2>Built for <span class="grad-text">speed &amp; reliability</span></h2>
+    <div class="g4 mt36 mw960 w-full">
+      <div class="card card-sm fcol">
+        <div style="font-size:1.5rem;margin-bottom:10px;">⚡</div>
+        <div class="fw700 fs13">API Cache</div>
+        <div class="fs11 c-muted mt8 lh16">60s in-memory cache. Stable data (departments, leave types) cached 5 min. Zero re-fetches on navigation.</div>
+      </div>
+      <div class="card card-sm fcol">
+        <div style="font-size:1.5rem;margin-bottom:10px;">🔗</div>
+        <div class="fw700 fs13">In-flight Dedup</div>
+        <div class="fs11 c-muted mt8 lh16">If two components request the same URL at once, only one HTTP call fires. Both share the result.</div>
+      </div>
+      <div class="card card-sm fcol">
+        <div style="font-size:1.5rem;margin-bottom:10px;">🔥</div>
+        <div class="fw700 fs13">Keepalive</div>
+        <div class="fs11 c-muted mt8 lh16">Pings backend every 4 min. Prevents Vercel serverless cold starts (3–8s delays) during business hours.</div>
+      </div>
+      <div class="card card-sm fcol">
+        <div style="font-size:1.5rem;margin-bottom:10px;">🗄️</div>
+        <div class="fw700 fs13">DB Indexes</div>
+        <div class="fs11 c-muted mt8 lh16">12 targeted composite indexes. User.managerId, Leave.(status+dates), AuditLog.action — 5–20× query speed.</div>
+      </div>
+      <div class="card card-sm fcol">
+        <div style="font-size:1.5rem;margin-bottom:10px;">🔄</div>
+        <div class="fw700 fs13">N+1 Fixed</div>
+        <div class="fs11 c-muted mt8 lh16">Leave balance was N queries (1 per leave type). Now 2 parallel queries + in-memory grouping.</div>
+      </div>
+      <div class="card card-sm fcol">
+        <div style="font-size:1.5rem;margin-bottom:10px;">📦</div>
+        <div class="fw700 fs13">Parallel Auth</div>
+        <div class="fs11 c-muted mt8 lh16">getMe + getPermissions now run in parallel on login. Startup time cut by ~40%.</div>
+      </div>
+      <div class="card card-sm fcol">
+        <div style="font-size:1.5rem;margin-bottom:10px;">💀</div>
+        <div class="fw700 fs13">allSettled</div>
+        <div class="fs11 c-muted mt8 lh16">Independent API calls use Promise.allSettled — one failure never blanks the whole page.</div>
+      </div>
+      <div class="card card-sm fcol">
+        <div style="font-size:1.5rem;margin-bottom:10px;">🦴</div>
+        <div class="fw700 fs13">Skeleton UI</div>
+        <div class="fs11 c-muted mt8 lh16">Shimmer skeletons during load — never a blank white screen. Page feels instant.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 13 — ROADMAP                                      -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="slide bg-hero">
+    <div class="blob" style="width:400px;height:400px;background:rgb(220,38,38);top:-80px;right:-60px;"></div>
+    <div class="tag">What's Next</div>
+    <h2>Roadmap — <span class="grad-text">Phase 2 &amp; Beyond</span></h2>
+    <div class="g2 mt28 mw960 w-full">
+      <div class="flex fcol gap12">
+        <div class="road-item">
+          <div class="road-num">1</div>
+          <div>
+            <div class="fw700 fs13">💰 Payroll Integration</div>
+            <div class="fs11 c-muted mt8">Auto-generate payslips from attendance + leave data. Integration with Razorpay/Zoho Payroll.</div>
+          </div>
+        </div>
+        <div class="road-item">
+          <div class="road-num">2</div>
+          <div>
+            <div class="fw700 fs13">📱 Mobile App (React Native)</div>
+            <div class="fs11 c-muted mt8">Native iOS/Android with GPS check-in, push notifications for approvals, offline support.</div>
+          </div>
+        </div>
+        <div class="road-item">
+          <div class="road-num">3</div>
+          <div>
+            <div class="fw700 fs13">🎯 Performance Reviews</div>
+            <div class="fs11 c-muted mt8">Goal setting, OKR tracking, 360° feedback cycles, and manager review workflows.</div>
+          </div>
+        </div>
+        <div class="road-item">
+          <div class="road-num">4</div>
+          <div>
+            <div class="fw700 fs13">📊 HR Analytics Dashboard</div>
+            <div class="fs11 c-muted mt8">Attrition trends, attendance heatmaps, leave patterns, headcount growth charts.</div>
+          </div>
+        </div>
+      </div>
+      <div class="flex fcol gap12">
+        <div class="road-item">
+          <div class="road-num">5</div>
+          <div>
+            <div class="fw700 fs13">🤖 AI Assistant</div>
+            <div class="fs11 c-muted mt8">"Who is on leave this week?" / "Show me late arrivals this month" — natural language HR queries.</div>
+          </div>
+        </div>
+        <div class="road-item">
+          <div class="road-num">6</div>
+          <div>
+            <div class="fw700 fs13">🔔 Real-time Notifications</div>
+            <div class="fs11 c-muted mt8">WebSocket/SSE-based push for instant approval alerts, check-in reminders, announcements.</div>
+          </div>
+        </div>
+        <div class="road-item">
+          <div class="road-num">7</div>
+          <div>
+            <div class="fw700 fs13">🏖️ Holiday Policy Engine</div>
+            <div class="fs11 c-muted mt8">Region-specific holidays, optional days, custom carry-forward rules per leave type.</div>
+          </div>
+        </div>
+        <div class="road-item">
+          <div class="road-num">8</div>
+          <div>
+            <div class="fw700 fs13">🔗 Integrations</div>
+            <div class="fs11 c-muted mt8">Slack bot for approvals, Google Calendar sync for leaves, Zoho CRM/People bridges.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 14 — SUMMARY                                      -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="slide bg-hero">
+    <div class="blob" style="width:500px;height:500px;background:rgb(220,38,38);top:-120px;right:-120px;"></div>
+    <div class="blob" style="width:350px;height:350px;background:rgb(249,115,22);bottom:-80px;left:-80px;"></div>
+    <div class="cover-logo">P</div>
+    <h2 style="text-align:center;">ATLAS HR — <span class="grad-text">Built. Deployed. Scaling.</span></h2>
+    <div class="flex gap12 fwrap jcenter mt28">
+      <div class="card card-sm" style="text-align:center;min-width:140px;">
+        <div style="font-size:1.8rem;font-weight:900;" class="grad-text">8+</div>
+        <div class="fs11 c-muted mt8 fw600">Core Modules</div>
+      </div>
+      <div class="card card-sm" style="text-align:center;min-width:140px;">
+        <div style="font-size:1.8rem;font-weight:900;" class="grad-text">4</div>
+        <div class="fs11 c-muted mt8 fw600">User Roles</div>
+      </div>
+      <div class="card card-sm" style="text-align:center;min-width:140px;">
+        <div style="font-size:1.8rem;font-weight:900;" class="grad-text">60s</div>
+        <div class="fs11 c-muted mt8 fw600">API Cache TTL</div>
+      </div>
+      <div class="card card-sm" style="text-align:center;min-width:140px;">
+        <div style="font-size:1.8rem;font-weight:900;" class="grad-text">12</div>
+        <div class="fs11 c-muted mt8 fw600">DB Indexes Added</div>
+      </div>
+      <div class="card card-sm" style="text-align:center;min-width:140px;">
+        <div style="font-size:1.8rem;font-weight:900;" class="grad-text">100%</div>
+        <div class="fs11 c-muted mt8 fw600">TypeScript</div>
+      </div>
+    </div>
+    <div class="card mt28" style="padding:20px 32px;text-align:center;max-width:640px;border-color:rgba(220,38,38,0.3);">
+      <div class="fw700" style="margin-bottom:8px;">🎯 What we've built</div>
+      <p class="fs13 c-muted lh16">
+        A production-ready HR platform with OTP auth, role-based access, real-time dashboards, complete attendance &amp; leave lifecycle, onboarding, org structure, audit trail — and a performance stack designed to stay fast at scale.
+      </p>
+    </div>
+    <p class="c-muted fs13 mt20" style="opacity:0.5;">Questions? ↑ Use arrow keys or dots to navigate slides</p>
+  </section>
+
+</div>
+
+<!-- ── Progress bar ── -->
+<div id="progress"></div>
+
+<!-- ── Slide dots ── -->
+<div id="dots"></div>
+
+<!-- ── Navigation ── -->
+<div id="nav">
+  <button class="nav-btn" id="prev" onclick="go(-1)">←</button>
+  <span id="slide-num">1 / 14</span>
+  <button class="nav-btn" id="next" onclick="go(1)">→</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total  = slides.length;
+  let current  = 0;
+
+  // Build dots
+  const dotsEl = document.getElementById('dots');
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.title = `Slide ${i + 1}`;
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  });
+
+  function update() {
+    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
+    document.getElementById('slide-num').textContent = `${current + 1} / ${total}`;
+    document.getElementById('prev').disabled = current === 0;
+    document.getElementById('next').disabled = current === total - 1;
+    document.getElementById('progress').style.width = `${((current + 1) / total) * 100}%`;
+  }
+
+  function goTo(idx) {
+    if (idx < 0 || idx >= total) return;
+    slides[current].classList.remove('active');
+    slides[current].classList.add('exiting');
+    const old = current;
+    setTimeout(() => slides[old].classList.remove('exiting'), 450);
+    current = idx;
+    slides[current].classList.add('active');
+    update();
+  }
+
+  function go(dir) { goTo(current + dir); }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); go(1); }
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                    { e.preventDefault(); go(-1); }
+  });
+
+  // Touch/swipe support
+  let tx = 0;
+  document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; });
+  document.addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
+  });
+
+  update();
+</script>
+</body>
+</html>

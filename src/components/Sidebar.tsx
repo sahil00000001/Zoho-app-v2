@@ -70,7 +70,7 @@ export default function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
         </div>
         {!collapsed && (
           <div>
-            <span className="font-black text-base tracking-tight gradient-text">Atlas</span>
+            <span className="font-black text-base tracking-tight gradient-text">ATLAS</span>
             <div className="text-[10px] text-gray-400 font-medium -mt-0.5">HR Platform</div>
           </div>
         )}

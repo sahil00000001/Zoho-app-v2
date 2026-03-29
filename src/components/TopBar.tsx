@@ -28,7 +28,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
   const [pendingCount, setPendingCount] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const meta = PAGE_META[path] || { title: "Atlas", icon: "⊞" };
+  const meta = PAGE_META[path] || { title: "ATLAS", icon: "⊞" };
   const today = new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" });
   const initials = user ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase() : "U";
   const canApprove = isRole("MANAGER", "HR", "ADMIN");
