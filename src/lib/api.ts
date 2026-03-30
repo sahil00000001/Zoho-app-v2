@@ -162,7 +162,10 @@ export const api = {
     request('/api/leaves', { method: 'POST', body: JSON.stringify(data) }),
   cancelLeave: (id: string) => request(`/api/leaves/${id}/cancel`, { method: 'PATCH' }),
   getAllLeaves: (params?: { status?: string; userId?: string }) => {
-    const qs = new URLSearchParams(params as Record<string, string>).toString();
+    const clean = Object.fromEntries(
+      Object.entries(params ?? {}).filter(([, v]) => v !== undefined && v !== '' && v !== 'undefined')
+    );
+    const qs = new URLSearchParams(clean).toString();
     return request(`/api/leaves${qs ? `?${qs}` : ''}`);
   },
   approveLeave: (id: string) => request(`/api/leaves/${id}/approve`, { method: 'PATCH' }),

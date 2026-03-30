@@ -66,7 +66,7 @@ export default function ApprovalsPage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await api.getAllLeaves({ status: statusFilter || undefined });
+      const data = await api.getAllLeaves(statusFilter ? { status: statusFilter } : undefined);
       setLeaves(data as Leave[]);
     } catch {
       setError("Failed to load leave requests. Please try again.");
