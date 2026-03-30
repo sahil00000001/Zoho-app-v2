@@ -230,7 +230,7 @@
   <section class="slide active bg-hero">
     <div class="blob" style="width:500px;height:500px;background:rgb(220,38,38);top:-100px;right:-100px;"></div>
     <div class="blob" style="width:350px;height:350px;background:rgb(249,115,22);bottom:-80px;left:-80px;"></div>
-    <div class="cover-logo">P</div>
+    <div class="cover-logo">A</div>
     <div class="tag">HR Technology Platform</div>
     <h1 style="text-align:center;">ATLAS HR<br><span class="grad-text">Workforce OS</span></h1>
     <p class="sub">A complete, role-based HR &amp; attendance management platform built for modern teams — from check-in to compliance.</p>
@@ -418,8 +418,8 @@
       <div class="role-row">
         <div style="width:42px;height:42px;border-radius:12px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">👥</div>
         <div class="flex-1">
-          <div class="flex acenter gap12 fwrap"><span class="fw700">Manager</span><span class="pill pill-blue" style="font-size:10px;">+ Team Access</span></div>
-          <div class="fs13 c-muted mt8">All Employee access · Approve/reject team leave requests with notes · View team attendance · Dashboard team stats</div>
+          <div class="flex acenter gap12 fwrap"><span class="fw700">Manager</span><span class="pill pill-blue" style="font-size:10px;">+ Team Access</span><span class="pill pill-green" style="font-size:10px;">Auto-promoted</span></div>
+          <div class="fs13 c-muted mt8">All Employee access · Approve/reject team leave requests with notes · View team attendance · Dashboard team stats · <strong style="color:#93c5fd;">Role auto-assigned when subordinates are added</strong></div>
         </div>
       </div>
       <div class="role-row">
@@ -490,6 +490,7 @@
         <div class="fw700 mb" style="margin-bottom:10px;">🛡️ Every Request</div>
         <ul class="blist">
           <li>Bearer token validated on every API call</li>
+          <li><strong>Live role fetched from DB</strong> — promotions take effect instantly, no re-login needed</li>
           <li>Role &amp; permission checked per endpoint</li>
           <li>All sensitive actions written to Audit Log</li>
         </ul>
@@ -527,6 +528,12 @@
         <div style="font-size:1.4rem">🔚</div>
         <div class="fw700 fs13">Check Out</div>
         <div class="fs11 c-muted mt8">Work hours auto-calc</div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step-box" style="border-color:rgba(245,158,11,0.4);">
+        <div style="font-size:1.4rem">↩️</div>
+        <div class="fw700 fs13">Re-Check-In</div>
+        <div class="fs11 c-muted mt8">Accidental checkout? Resume — original time preserved</div>
       </div>
       <div class="step-arrow">→</div>
       <div class="step-box">
@@ -579,13 +586,18 @@
           </div>
           <div style="text-align:center;color:var(--muted);font-size:1.2rem;">↓</div>
           <div class="step-box" style="min-width:unset;width:100%;flex-direction:row;text-align:left;gap:14px;border-color:rgba(249,115,22,0.35);">
-            <div style="font-size:1.3rem">⏳</div>
-            <div><div class="fw700 fs13">Pending · Manager Notified</div><div class="fs11 c-muted mt8">Notification bell badge in TopBar</div></div>
+            <div style="font-size:1.3rem">📧</div>
+            <div><div class="fw700 fs13">Manager Emailed Instantly</div><div class="fs11 c-muted mt8">Email with name, leave type, days, dates, reason · Notification bell badge in portal</div></div>
           </div>
           <div style="text-align:center;color:var(--muted);font-size:1.2rem;">↓</div>
           <div class="step-box" style="min-width:unset;width:100%;flex-direction:row;text-align:left;gap:14px;border-color:rgba(34,197,94,0.35);">
             <div style="font-size:1.3rem">✅</div>
-            <div><div class="fw700 fs13">Approved / Rejected</div><div class="fs11 c-muted mt8">Manager can add rejection reason</div></div>
+            <div><div class="fw700 fs13">Manager Approves / Rejects</div><div class="fs11 c-muted mt8">One click in Approvals section · Add rejection reason</div></div>
+          </div>
+          <div style="text-align:center;color:var(--muted);font-size:1.2rem;">↓</div>
+          <div class="step-box" style="min-width:unset;width:100%;flex-direction:row;text-align:left;gap:14px;border-color:rgba(99,102,241,0.35);">
+            <div style="font-size:1.3rem">📨</div>
+            <div><div class="fw700 fs13">Employee &amp; Admin Notified</div><div class="fs11 c-muted mt8">Employee gets approval/rejection email · All ADMIN + HR get FYI notification</div></div>
           </div>
           <div style="text-align:center;color:var(--muted);font-size:1.2rem;">↓</div>
           <div class="step-box" style="min-width:unset;width:100%;flex-direction:row;text-align:left;gap:14px;">
@@ -609,8 +621,60 @@
         </div>
         <div class="card card-sm">
           <div class="fw700 fs13 mb" style="margin-bottom:10px;">🚫 Smart Validation</div>
-          <div class="fs13 c-muted lh16">Overlap detection prevents double-booking the same date range automatically.</div>
+          <div class="fs13 c-muted lh16">Overlap detection prevents double-booking. Falls back to HR/ADMIN if no manager assigned.</div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 9 — EMAIL NOTIFICATION SYSTEM                     -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="slide bg-dark">
+    <div class="blob" style="width:300px;height:300px;background:rgb(99,102,241);top:5%;right:-40px;"></div>
+    <div class="tag">Feature · Email Notifications</div>
+    <h2>Automated, <span class="grad-text">professional emails</span></h2>
+    <div class="g3 mt28 mw960 w-full">
+      <div class="card card-accent">
+        <div class="icon-circle" style="font-size:1.3rem;">📩</div>
+        <div class="fw700 fs13">Leave Request → Manager</div>
+        <div class="fs11 c-muted mt8 lh16" style="margin-top:10px;">Triggered when employee applies. Subject:<br><em style="color:#fca5a5;">"Leave Request: Rahul Sharma | 3 Days Casual Leave"</em></div>
+        <ul class="blist mt14">
+          <li>Employee name, ID, department</li>
+          <li>Leave type, dates, duration</li>
+          <li>Reason for leave</li>
+          <li>Direct link to Approvals portal</li>
+        </ul>
+      </div>
+      <div class="card" style="border-color:rgba(34,197,94,0.3);">
+        <div class="icon-circle" style="font-size:1.3rem;background:rgba(34,197,94,0.15);">✅</div>
+        <div class="fw700 fs13">Approval → Employee + Admin</div>
+        <div class="fs11 c-muted mt8 lh16" style="margin-top:10px;">Triggered when manager approves. Two emails fire:</div>
+        <ul class="blist mt14">
+          <li><strong style="color:#86efac;">Employee:</strong> "✅ Leave Approved: Casual Leave | 3 Days" — with approver name</li>
+          <li><strong style="color:#86efac;">All ADMIN + HR:</strong> FYI notification with full details</li>
+          <li>Leave type, duration, approved by</li>
+        </ul>
+      </div>
+      <div class="card" style="border-color:rgba(239,68,68,0.3);">
+        <div class="icon-circle" style="font-size:1.3rem;background:rgba(239,68,68,0.15);">❌</div>
+        <div class="fw700 fs13">Rejection → Employee</div>
+        <div class="fs11 c-muted mt8 lh16" style="margin-top:10px;">Triggered when manager rejects. Subject:<br><em style="color:#fca5a5;">"❌ Leave Rejected: Casual Leave | 3 Days"</em></div>
+        <ul class="blist mt14">
+          <li>Leave type, dates, rejection reason</li>
+          <li>Reviewer name</li>
+          <li>Link back to leaves portal</li>
+          <li>Fire-and-forget — API never fails if SMTP is down</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card mt20 mw960 w-full card-sm">
+      <div class="flex gap16 acenter fwrap">
+        <span class="fw700 fs13">Also emails:</span>
+        <span class="pill pill-blue">🎉 Welcome email on new employee creation</span>
+        <span class="pill pill-orange">🔑 OTP on every login</span>
+        <span class="pill pill-purple">📢 Announcement broadcast to team</span>
+        <span class="pill pill-green">Smart fallback → HR/ADMIN if no manager set</span>
       </div>
     </div>
   </section>
@@ -809,6 +873,16 @@
         <div class="fw700 fs13">Skeleton UI</div>
         <div class="fs11 c-muted mt8 lh16">Shimmer skeletons during load — never a blank white screen. Page feels instant.</div>
       </div>
+      <div class="card card-sm fcol">
+        <div style="font-size:1.5rem;margin-bottom:10px;">📱</div>
+        <div class="fw700 fs13">Mobile-First</div>
+        <div class="fs11 c-muted mt8 lh16">Hamburger sidebar drawer on mobile. Responsive grids, wrapping headers. Full UX on any screen size.</div>
+      </div>
+      <div class="card card-sm fcol">
+        <div style="font-size:1.5rem;margin-bottom:10px;">🔄</div>
+        <div class="fw700 fs13">Live Role Sync</div>
+        <div class="fs11 c-muted mt8 lh16">Auth middleware fetches current role from DB every request. Role promotions take effect instantly — no logout required.</div>
+      </div>
     </div>
   </section>
 
@@ -889,37 +963,41 @@
   <section class="slide bg-hero">
     <div class="blob" style="width:500px;height:500px;background:rgb(220,38,38);top:-120px;right:-120px;"></div>
     <div class="blob" style="width:350px;height:350px;background:rgb(249,115,22);bottom:-80px;left:-80px;"></div>
-    <div class="cover-logo">P</div>
+    <div class="cover-logo">A</div>
     <h2 style="text-align:center;">ATLAS HR — <span class="grad-text">Built. Deployed. Scaling.</span></h2>
     <div class="flex gap12 fwrap jcenter mt28">
-      <div class="card card-sm" style="text-align:center;min-width:140px;">
+      <div class="card card-sm" style="text-align:center;min-width:130px;">
         <div style="font-size:1.8rem;font-weight:900;" class="grad-text">8+</div>
         <div class="fs11 c-muted mt8 fw600">Core Modules</div>
       </div>
-      <div class="card card-sm" style="text-align:center;min-width:140px;">
+      <div class="card card-sm" style="text-align:center;min-width:130px;">
         <div style="font-size:1.8rem;font-weight:900;" class="grad-text">4</div>
         <div class="fs11 c-muted mt8 fw600">User Roles</div>
       </div>
-      <div class="card card-sm" style="text-align:center;min-width:140px;">
-        <div style="font-size:1.8rem;font-weight:900;" class="grad-text">60s</div>
-        <div class="fs11 c-muted mt8 fw600">API Cache TTL</div>
+      <div class="card card-sm" style="text-align:center;min-width:130px;">
+        <div style="font-size:1.8rem;font-weight:900;" class="grad-text">5</div>
+        <div class="fs11 c-muted mt8 fw600">Email Triggers</div>
       </div>
-      <div class="card card-sm" style="text-align:center;min-width:140px;">
+      <div class="card card-sm" style="text-align:center;min-width:130px;">
         <div style="font-size:1.8rem;font-weight:900;" class="grad-text">12</div>
-        <div class="fs11 c-muted mt8 fw600">DB Indexes Added</div>
+        <div class="fs11 c-muted mt8 fw600">DB Indexes</div>
       </div>
-      <div class="card card-sm" style="text-align:center;min-width:140px;">
+      <div class="card card-sm" style="text-align:center;min-width:130px;">
         <div style="font-size:1.8rem;font-weight:900;" class="grad-text">100%</div>
         <div class="fs11 c-muted mt8 fw600">TypeScript</div>
       </div>
+      <div class="card card-sm" style="text-align:center;min-width:130px;">
+        <div style="font-size:1.8rem;font-weight:900;" class="grad-text">📱</div>
+        <div class="fs11 c-muted mt8 fw600">Mobile Ready</div>
+      </div>
     </div>
-    <div class="card mt28" style="padding:20px 32px;text-align:center;max-width:640px;border-color:rgba(220,38,38,0.3);">
+    <div class="card mt20" style="padding:18px 28px;text-align:center;max-width:680px;border-color:rgba(220,38,38,0.3);">
       <div class="fw700" style="margin-bottom:8px;">🎯 What we've built</div>
       <p class="fs13 c-muted lh16">
-        A production-ready HR platform with OTP auth, role-based access, real-time dashboards, complete attendance &amp; leave lifecycle, onboarding, org structure, audit trail — and a performance stack designed to stay fast at scale.
+        A production-ready HR platform with OTP auth, live role-based access control, real-time dashboards, complete attendance &amp; leave lifecycle with automated email notifications, employee onboarding, org structure, audit trail — fully mobile-responsive and designed to stay fast at scale.
       </p>
     </div>
-    <p class="c-muted fs13 mt20" style="opacity:0.5;">Questions? ↑ Use arrow keys or dots to navigate slides</p>
+    <p class="c-muted fs13 mt14" style="opacity:0.5;">Questions? ↑ Use arrow keys or dots to navigate slides</p>
   </section>
 
 </div>
@@ -933,7 +1011,7 @@
 <!-- ── Navigation ── -->
 <div id="nav">
   <button class="nav-btn" id="prev" onclick="go(-1)">←</button>
-  <span id="slide-num">1 / 14</span>
+  <span id="slide-num">1 / 15</span>
   <button class="nav-btn" id="next" onclick="go(1)">→</button>
 </div>
 
