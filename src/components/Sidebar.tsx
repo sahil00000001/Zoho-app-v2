@@ -19,7 +19,6 @@ const NAV_GROUPS = [
     label: "Personal",
     items: [
       { href: "/dashboard/approvals",     label: "Approvals",     icon: "✅",  module: "approvals" },
-      { href: "/dashboard/profile",       label: "My Profile",    icon: "👤",  module: "profile" },
     ],
   },
 ];
