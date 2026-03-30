@@ -87,19 +87,6 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
       {/* Right side */}
       <div className="flex items-center gap-2">
 
-        {/* Cmd+K search trigger */}
-        <button
-          onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true }))}
-          className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl border border-gray-200 text-xs text-gray-400 hover:border-gray-300 hover:text-gray-600 transition-all bg-gray-50 hover:bg-white"
-          title="Search (⌘K)"
-        >
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <span>Search</span>
-          <kbd className="px-1 py-0.5 rounded bg-white border border-gray-200 text-[10px] font-semibold text-gray-400 ml-1">⌘K</kbd>
-        </button>
-
         {/* Notification bell — pending approvals */}
         {canApprove && (
           <Link
