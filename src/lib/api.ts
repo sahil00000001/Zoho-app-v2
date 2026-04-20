@@ -300,6 +300,24 @@ export const api = {
   bulkAssignManagers: (assignments: { userId: string; managerId: string | null }[]) =>
     request('/api/org-chart/bulk-assign', { method: 'PATCH', body: JSON.stringify({ assignments }) }),
 
+  // File upload (Supabase S3)
+  uploadFile: async (
+    file: File,
+    folder: 'avatars' | 'kra' | 'documents' | 'uploads' = 'uploads',
+  ): Promise<{ url: string; key: string; size: number; fileName: string; mimeType: string }> => {
+    const { accessToken } = getTokens();
+    const form = new FormData();
+    form.append('file', file);
+    const res = await fetch(`${API_BASE}/api/upload?folder=${folder}`, {
+      method: 'POST',
+      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+      body: form,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message || 'Upload failed');
+    return data.data;
+  },
+
   // Tokens
   setTokens,
   clearTokens,
