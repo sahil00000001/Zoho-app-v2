@@ -389,11 +389,6 @@ export default function OrgChartPage() {
               <option value="EMPLOYEE">Employee</option>
             </select>
 
-            {/* Re-layout */}
-            <button onClick={reLayout}
-              className="text-sm px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 font-medium flex items-center gap-1.5 transition-colors">
-              ↻ Reset layout
-            </button>
           </div>
         </Panel>
 
