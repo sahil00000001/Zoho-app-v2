@@ -13,6 +13,7 @@ const NAV_GROUPS = [
       { href: "/dashboard/leaves",        label: "Leaves",        icon: "🌿",  module: "leaves" },
       { href: "/dashboard/announcements", label: "Announcements", icon: "📢",  module: "announcements" },
       { href: "/dashboard/employees",     label: "Employees",     icon: "👥",  module: "users" },
+      { href: "/dashboard/org-chart",     label: "Org Chart",     icon: "🌐",  module: "org-chart" },
     ],
   },
   {
