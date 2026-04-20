@@ -218,9 +218,181 @@
     h2 { font-size: 1.6rem; }
     .flow-step { flex-wrap: wrap; justify-content: center; }
   }
+
+  /* ══════════════════════════════════════════════════════════
+     LIVE EFFECTS & HOVER ANIMATIONS
+  ══════════════════════════════════════════════════════════ */
+
+  /* ── Floating particle canvas ── */
+  #particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+
+  /* ── Cursor glow ── */
+  #cursor-glow {
+    position: fixed; width: 320px; height: 320px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(220,38,38,0.07) 0%, transparent 70%);
+    pointer-events: none; z-index: 1; transform: translate(-50%, -50%);
+    transition: opacity 0.3s ease;
+  }
+
+  /* ── Blobs pulse ── */
+  @keyframes blobPulse {
+    0%, 100% { transform: scale(1) translate(0, 0); opacity: 0.18; }
+    33%       { transform: scale(1.12) translate(10px, -15px); opacity: 0.22; }
+    66%       { transform: scale(0.92) translate(-8px, 10px); opacity: 0.14; }
+  }
+  .blob { animation: blobPulse 8s ease-in-out infinite; }
+  .blob:nth-child(2) { animation-delay: -3s; animation-duration: 11s; }
+
+  /* ── Cover logo spin + glow ── */
+  @keyframes logoFloat {
+    0%, 100% { transform: translateY(0) rotate(0deg); box-shadow: 0 20px 60px rgba(220,38,38,0.4); }
+    50%       { transform: translateY(-10px) rotate(3deg); box-shadow: 0 30px 80px rgba(249,115,22,0.5); }
+  }
+  .cover-logo { animation: logoFloat 3.5s ease-in-out infinite; cursor: default; }
+  .cover-logo:hover { animation-play-state: paused; transform: scale(1.15) rotate(-5deg) !important; transition: transform 0.3s; }
+
+  /* ── Cards lift on hover ── */
+  .card {
+    transition: transform 0.28s cubic-bezier(.2,.8,.3,1), border-color 0.28s ease, box-shadow 0.28s ease;
+    will-change: transform;
+  }
+  .card:hover {
+    transform: translateY(-5px) scale(1.015);
+    border-color: rgba(220,38,38,0.4);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.35), 0 0 0 1px rgba(220,38,38,0.15);
+  }
+
+  /* ── Role rows slide-glow on hover ── */
+  .role-row {
+    transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+    cursor: default;
+  }
+  .role-row:hover {
+    transform: translateX(6px);
+    border-color: rgba(220,38,38,0.35);
+    background: rgba(220,38,38,0.07);
+  }
+
+  /* ── Road items ── */
+  .road-item {
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    cursor: default;
+  }
+  .road-item:hover {
+    transform: translateX(5px);
+    border-color: rgba(249,115,22,0.4);
+    box-shadow: -3px 0 0 rgba(249,115,22,0.5);
+  }
+
+  /* ── Step boxes pulse border on hover ── */
+  .step-box {
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    cursor: default;
+  }
+  .step-box:hover {
+    transform: translateY(-4px);
+    border-color: rgba(220,38,38,0.5);
+    background: rgba(220,38,38,0.08);
+    box-shadow: 0 8px 24px rgba(220,38,38,0.2);
+  }
+
+  /* ── Tech badges spin icon ── */
+  .tech-badge {
+    transition: transform 0.28s cubic-bezier(.2,.8,.3,1), border-color 0.28s ease, background 0.28s ease;
+    cursor: default;
+  }
+  .tech-badge:hover { transform: translateY(-6px) scale(1.06); border-color: rgba(249,115,22,0.4); background: rgba(249,115,22,0.07); }
+  .tech-badge:hover .tech-icon { animation: iconSpin 0.6s ease; }
+  @keyframes iconSpin {
+    0%   { transform: rotate(0deg) scale(1); }
+    40%  { transform: rotate(-15deg) scale(1.3); }
+    100% { transform: rotate(0deg) scale(1); }
+  }
+
+  /* ── Pills shimmer on hover ── */
+  .pill {
+    transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    cursor: default;
+  }
+  .pill:hover { transform: translateY(-2px) scale(1.05); background: rgba(220,38,38,0.18); border-color: rgba(220,38,38,0.4); }
+
+  /* ── Nav buttons pop ── */
+  .nav-btn { transition: all 0.2s cubic-bezier(.2,.8,.3,1); }
+  .nav-btn:hover:not(:disabled) { transform: scale(1.15); background: var(--grad); border-color: transparent; box-shadow: 0 4px 20px rgba(220,38,38,0.4); }
+  .nav-btn:active:not(:disabled) { transform: scale(0.92); }
+
+  /* ── Dots expand on hover ── */
+  .dot { transition: all 0.25s ease; cursor: pointer; }
+  .dot:hover { transform: scale(1.6); background: rgba(249,115,22,0.7); }
+
+  /* ── Tag pulse ── */
+  @keyframes tagGlow {
+    0%, 100% { box-shadow: none; }
+    50%       { box-shadow: 0 0 16px rgba(249,115,22,0.3); }
+  }
+  .tag { animation: tagGlow 2.5s ease-in-out infinite; }
+
+  /* ── Slide enter animation for children ── */
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .slide.active > * {
+    animation: fadeSlideUp 0.5s cubic-bezier(.2,.8,.3,1) both;
+  }
+  .slide.active > *:nth-child(1) { animation-delay: 0.05s; }
+  .slide.active > *:nth-child(2) { animation-delay: 0.12s; }
+  .slide.active > *:nth-child(3) { animation-delay: 0.20s; }
+  .slide.active > *:nth-child(4) { animation-delay: 0.28s; }
+  .slide.active > *:nth-child(5) { animation-delay: 0.35s; }
+
+  /* ── Grad text shimmer ── */
+  @keyframes shimmer {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .grad-text {
+    background: linear-gradient(90deg, rgb(220,38,38), rgb(249,115,22), rgb(253,186,116), rgb(249,115,22), rgb(220,38,38));
+    background-size: 300% 300%;
+    animation: shimmer 4s ease infinite;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+
+  /* ── Stat numbers count-up shimmer ── */
+  @keyframes statPop {
+    0%   { transform: scale(0.7); opacity: 0; }
+    70%  { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* ── Progress bar gradient animation ── */
+  @keyframes progressShine {
+    0%   { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+  #progress {
+    background: linear-gradient(90deg, rgb(220,38,38), rgb(249,115,22), rgb(253,186,116), rgb(249,115,22), rgb(220,38,38));
+    background-size: 200% 100%;
+    animation: progressShine 2s linear infinite;
+  }
+
+  /* ── Icon circles rotate on hover ── */
+  .icon-circle { transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: default; }
+  .icon-circle:hover { transform: rotate(10deg) scale(1.12); box-shadow: 0 6px 20px rgba(220,38,38,0.3); }
+
+  /* ── Slide dots glow when active ── */
+  .dot.active { box-shadow: 0 0 10px rgba(220,38,38,0.6); }
+
+  /* ── Tilt effect container (applied via JS) ── */
+  [data-tilt] { transform-style: preserve-3d; }
 </style>
 </head>
 <body>
+
+<!-- ── Live background ── -->
+<canvas id="particles"></canvas>
+<div id="cursor-glow"></div>
 
 <div id="deck">
 
@@ -319,11 +491,6 @@
         <div style="font-size:1.6rem">👤</div>
         <div class="fw700 mt8">Profiles</div>
         <div class="fs11 c-muted mt8">Skills, certs, KRA documents</div>
-      </div>
-      <div class="card card-sm fcol acenter" style="text-align:center;">
-        <div style="font-size:1.6rem">🌳</div>
-        <div class="fw700 mt8">Org Chart</div>
-        <div class="fs11 c-muted mt8">Visual hierarchy, manager assign</div>
       </div>
       <div class="card card-sm fcol acenter" style="text-align:center;">
         <div style="font-size:1.6rem">🚀</div>
@@ -751,15 +918,15 @@
       </div>
       <div class="card">
         <div class="flex acenter gap12" style="margin-bottom:16px;">
-          <div class="icon-circle" style="margin-bottom:0;font-size:1.3rem;">🌳</div>
-          <div><div class="fw700">Org Chart</div><div class="fs11 c-muted">Visual hierarchy — all roles</div></div>
+          <div class="icon-circle" style="margin-bottom:0;font-size:1.3rem;">🔗</div>
+          <div><div class="fw700">Manager Assignment</div><div class="fs11 c-muted">Hierarchy &amp; auto-promotion</div></div>
         </div>
         <ul class="blist">
-          <li>Tree view of the full company hierarchy</li>
-          <li>Expand/collapse branches</li>
-          <li>Admin: drag-and-drop manager reassignment</li>
-          <li>Bulk assign managers for new hires</li>
-          <li>Every change logged to audit trail</li>
+          <li>Admin assigns manager per employee from profile page</li>
+          <li>Employee auto-promoted to MANAGER role on first subordinate</li>
+          <li>Auto-demoted back to EMPLOYEE when last subordinate removed</li>
+          <li>Live role lookup — no logout/re-login needed</li>
+          <li>Approval section appears instantly after promotion</li>
         </ul>
       </div>
     </div>
@@ -967,23 +1134,23 @@
     <h2 style="text-align:center;">ATLAS HR — <span class="grad-text">Built. Deployed. Scaling.</span></h2>
     <div class="flex gap12 fwrap jcenter mt28">
       <div class="card card-sm" style="text-align:center;min-width:130px;">
-        <div style="font-size:1.8rem;font-weight:900;" class="grad-text">8+</div>
+        <div style="font-size:1.8rem;font-weight:900;" class="grad-text" data-count="8" data-suffix="+">8+</div>
         <div class="fs11 c-muted mt8 fw600">Core Modules</div>
       </div>
       <div class="card card-sm" style="text-align:center;min-width:130px;">
-        <div style="font-size:1.8rem;font-weight:900;" class="grad-text">4</div>
+        <div style="font-size:1.8rem;font-weight:900;" class="grad-text" data-count="4">4</div>
         <div class="fs11 c-muted mt8 fw600">User Roles</div>
       </div>
       <div class="card card-sm" style="text-align:center;min-width:130px;">
-        <div style="font-size:1.8rem;font-weight:900;" class="grad-text">5</div>
+        <div style="font-size:1.8rem;font-weight:900;" class="grad-text" data-count="5">5</div>
         <div class="fs11 c-muted mt8 fw600">Email Triggers</div>
       </div>
       <div class="card card-sm" style="text-align:center;min-width:130px;">
-        <div style="font-size:1.8rem;font-weight:900;" class="grad-text">12</div>
+        <div style="font-size:1.8rem;font-weight:900;" class="grad-text" data-count="12">12</div>
         <div class="fs11 c-muted mt8 fw600">DB Indexes</div>
       </div>
       <div class="card card-sm" style="text-align:center;min-width:130px;">
-        <div style="font-size:1.8rem;font-weight:900;" class="grad-text">100%</div>
+        <div style="font-size:1.8rem;font-weight:900;" class="grad-text" data-count="100" data-suffix="%">100%</div>
         <div class="fs11 c-muted mt8 fw600">TypeScript</div>
       </div>
       <div class="card card-sm" style="text-align:center;min-width:130px;">
@@ -1016,6 +1183,138 @@
 </div>
 
 <script>
+  /* ══════════════════════════════════════════
+     PARTICLE SYSTEM
+  ══════════════════════════════════════════ */
+  (function() {
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let W, H, particles = [];
+
+    function resize() {
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    function rand(min, max) { return Math.random() * (max - min) + min; }
+
+    function createParticle() {
+      return {
+        x: rand(0, W), y: rand(0, H),
+        r: rand(0.8, 2.2),
+        vx: rand(-0.2, 0.2), vy: rand(-0.3, -0.05),
+        alpha: rand(0.1, 0.45),
+        color: Math.random() > 0.6 ? '220,38,38' : Math.random() > 0.5 ? '249,115,22' : '255,255,255',
+      };
+    }
+
+    for (let i = 0; i < 90; i++) particles.push(createParticle());
+
+    function animate() {
+      ctx.clearRect(0, 0, W, H);
+      for (const p of particles) {
+        p.x += p.vx; p.y += p.vy;
+        if (p.y < -4) { p.y = H + 4; p.x = rand(0, W); }
+        if (p.x < -4) p.x = W + 4;
+        if (p.x > W + 4) p.x = -4;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${p.color},${p.alpha})`;
+        ctx.fill();
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+  })();
+
+  /* ══════════════════════════════════════════
+     CURSOR GLOW
+  ══════════════════════════════════════════ */
+  (function() {
+    const glow = document.getElementById('cursor-glow');
+    let mx = -500, my = -500;
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      glow.style.left = mx + 'px';
+      glow.style.top  = my + 'px';
+    });
+  })();
+
+  /* ══════════════════════════════════════════
+     3D TILT ON CARDS
+  ══════════════════════════════════════════ */
+  (function() {
+    function applyTilt(el) {
+      el.addEventListener('mousemove', e => {
+        const r = el.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width  - 0.5;
+        const y = (e.clientY - r.top)  / r.height - 0.5;
+        el.style.transform = `translateY(-5px) scale(1.015) rotateY(${x * 10}deg) rotateX(${-y * 10}deg)`;
+      });
+      el.addEventListener('mouseleave', () => {
+        el.style.transform = '';
+        el.style.transition = 'transform 0.5s cubic-bezier(.2,.8,.3,1)';
+        setTimeout(() => el.style.transition = '', 500);
+      });
+    }
+    document.querySelectorAll('.card').forEach(applyTilt);
+  })();
+
+  /* ══════════════════════════════════════════
+     CLICK RIPPLE ON STEP BOXES
+  ══════════════════════════════════════════ */
+  document.querySelectorAll('.step-box').forEach(el => {
+    el.style.position = 'relative';
+    el.style.overflow = 'hidden';
+    el.addEventListener('click', function(e) {
+      const r = this.getBoundingClientRect();
+      const ripple = document.createElement('span');
+      ripple.style.cssText = `
+        position:absolute;border-radius:50%;background:rgba(220,38,38,0.3);
+        width:0;height:0;left:${e.clientX - r.left}px;top:${e.clientY - r.top}px;
+        transform:translate(-50%,-50%);pointer-events:none;
+        animation:rippleAnim 0.55s ease-out forwards;
+      `;
+      this.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+    });
+  });
+  // Inject ripple keyframes
+  const styleEl = document.createElement('style');
+  styleEl.textContent = `
+    @keyframes rippleAnim {
+      to { width: 200px; height: 200px; opacity: 0; }
+    }
+  `;
+  document.head.appendChild(styleEl);
+
+  /* ══════════════════════════════════════════
+     COUNTER ANIMATION FOR STAT NUMBERS
+  ══════════════════════════════════════════ */
+  function animateCounters(slide) {
+    slide.querySelectorAll('[data-count]').forEach(el => {
+      const target = parseFloat(el.dataset.count);
+      const isFloat = String(target).includes('.');
+      const suffix = el.dataset.suffix || '';
+      let start = null;
+      const duration = 1200;
+      function step(ts) {
+        if (!start) start = ts;
+        const progress = Math.min((ts - start) / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        const val = target * ease;
+        el.textContent = (isFloat ? val.toFixed(1) : Math.round(val)) + suffix;
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }
+
+  /* ══════════════════════════════════════════
+     SLIDE ENGINE
+  ══════════════════════════════════════════ */
   const slides = document.querySelectorAll('.slide');
   const total  = slides.length;
   let current  = 0;
@@ -1047,6 +1346,8 @@
     current = idx;
     slides[current].classList.add('active');
     update();
+    // Trigger counter animation when landing on any slide that has stat counters
+    setTimeout(() => animateCounters(slides[current]), 300);
   }
 
   function go(dir) { goTo(current + dir); }
@@ -1065,6 +1366,7 @@
   });
 
   update();
+  animateCounters(slides[current]);
 </script>
 </body>
 </html>

@@ -206,10 +206,36 @@ export const api = {
     request('/api/profile/me/certifications', { method: 'POST', body: JSON.stringify(data) }),
   deleteCertification: (id: string) => request(`/api/profile/me/certifications/${id}`, { method: 'DELETE' }),
   getMyKRA: () => request('/api/profile/me/kra'),
-  uploadKRA: (data: { title: string; period?: string; fileUrl: string; fileName: string; fileSize?: number; mimeType?: string }) =>
-    request('/api/profile/me/kra', { method: 'POST', body: JSON.stringify(data) }),
+  uploadKRA: async (file: File, title: string, period?: string): Promise<unknown> => {
+    const { accessToken } = getTokens();
+    const form = new FormData();
+    form.append('file', file);
+    form.append('title', title);
+    if (period) form.append('period', period);
+    const res = await fetch(`${API_BASE}/api/profile/me/kra`, {
+      method: 'POST',
+      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+      body: form,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message || 'KRA upload failed');
+    return data.data;
+  },
   deleteKRA: (id: string) => request(`/api/profile/me/kra/${id}`, { method: 'DELETE' }),
   getAllKRA: () => request('/api/profile/kra/all'),
+  uploadCertificationFile: async (file: File): Promise<{ url: string; key: string; fileName: string; mimeType: string; size: number }> => {
+    const { accessToken } = getTokens();
+    const form = new FormData();
+    form.append('file', file);
+    const res = await fetch(`${API_BASE}/api/profile/me/certifications/upload`, {
+      method: 'POST',
+      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+      body: form,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message || 'Upload failed');
+    return data.data;
+  },
   getProfileById: (userId: string) => request(`/api/profile/${userId}`),
 
   // Announcements
@@ -507,4 +533,6 @@ export interface CertificationData {
   issueDate?: string;
   expiryDate?: string;
   credentialId?: string;
+  fileUrl?: string;
+  fileName?: string;
 }

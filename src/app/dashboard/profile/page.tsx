@@ -28,6 +28,8 @@ interface Certification {
   issueDate?: string;
   expiryDate?: string;
   credentialId?: string;
+  fileUrl?: string;
+  fileName?: string;
 }
 
 interface KRADocument {
@@ -102,15 +104,6 @@ function resizeImage(file: File): Promise<string> {
   });
 }
 
-// Convert file to base64 for KRA (PDF/DOC)
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
 
 export default function ProfilePage() {
   const { user, isRole } = useAuth();
@@ -138,6 +131,9 @@ export default function ProfilePage() {
   // Cert form
   const [showCertForm, setShowCertForm] = useState(false);
   const [certForm, setCertForm] = useState({ name: '', issuer: '', issueDate: '', expiryDate: '', credentialId: '' });
+  const [certFile, setCertFile] = useState<File | null>(null);
+  const [certFileUploading, setCertFileUploading] = useState(false);
+  const certFileRef = useRef<HTMLInputElement>(null);
 
   // KRA form
   const [kraTitle, setKraTitle] = useState('');
@@ -256,17 +252,26 @@ export default function ProfilePage() {
 
   async function handleAddCert() {
     if (!certForm.name.trim()) return;
-    setSaving(true);
+    setCertFileUploading(true);
     try {
-      await api.addCertification(certForm);
+      let fileUrl: string | undefined;
+      let fileName: string | undefined;
+      if (certFile) {
+        const uploaded = await api.uploadCertificationFile(certFile);
+        fileUrl = uploaded.url;
+        fileName = uploaded.fileName;
+      }
+      await api.addCertification({ ...certForm, fileUrl, fileName });
       await loadProfile();
       setShowCertForm(false);
       setCertForm({ name: '', issuer: '', issueDate: '', expiryDate: '', credentialId: '' });
+      setCertFile(null);
+      if (certFileRef.current) certFileRef.current.value = '';
       showSuccess('Certification added');
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Failed');
     } finally {
-      setSaving(false);
+      setCertFileUploading(false);
     }
   }
 
@@ -284,15 +289,7 @@ export default function ProfilePage() {
     if (kraFile.size > 10 * 1024 * 1024) { setError('File too large. Max 10MB.'); return; }
     setKraUploading(true);
     try {
-      const base64 = await fileToBase64(kraFile);
-      await api.uploadKRA({
-        title: kraTitle.trim(),
-        period: kraPeriod.trim() || undefined,
-        fileUrl: base64,
-        fileName: kraFile.name,
-        fileSize: kraFile.size,
-        mimeType: kraFile.type,
-      });
+      await api.uploadKRA(kraFile, kraTitle.trim(), kraPeriod.trim() || undefined);
       await loadProfile();
       if (isHRAdmin || isManager) {
         const kra = await api.getAllKRA() as KRADocument[];
@@ -326,10 +323,7 @@ export default function ProfilePage() {
 
   function downloadKRA(doc: KRADocument) {
     if (!doc.fileUrl) return;
-    const a = document.createElement('a');
-    a.href = doc.fileUrl;
-    a.download = doc.fileName;
-    a.click();
+    window.open(doc.fileUrl, '_blank', 'noopener,noreferrer');
   }
 
 
@@ -702,13 +696,44 @@ export default function ProfilePage() {
                   />
                 </div>
               </div>
+              <div className="sm:col-span-2 mt-2">
+                <label className="block text-xs text-gray-500 mb-1">Certificate Document (optional)</label>
+                <div
+                  className={`border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-colors ${
+                    certFile ? 'border-green-300 bg-green-50' : 'border-slate-200 hover:border-red-300 hover:bg-red-50/30'
+                  }`}
+                  onClick={() => certFileRef.current?.click()}
+                >
+                  <input
+                    ref={certFileRef}
+                    type="file"
+                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                    className="hidden"
+                    onChange={e => setCertFile(e.target.files?.[0] || null)}
+                  />
+                  {certFile ? (
+                    <div className="flex items-center justify-center gap-3">
+                      <span className="text-lg">📄</span>
+                      <span className="text-sm font-medium text-gray-800">{certFile.name}</span>
+                      <button
+                        onClick={e => { e.stopPropagation(); setCertFile(null); if (certFileRef.current) certFileRef.current.value = ''; }}
+                        className="text-xs text-red-400 hover:text-red-600"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="text-sm text-gray-400">Click to attach PDF, Word, or image · Max 10MB</div>
+                  )}
+                </div>
+              </div>
               <button
                 onClick={handleAddCert}
-                disabled={saving || !certForm.name.trim()}
+                disabled={certFileUploading || !certForm.name.trim()}
                 className="mt-4 px-5 py-2 rounded-xl text-sm font-medium text-white disabled:opacity-50"
                 style={{ background: 'linear-gradient(90deg, rgb(220,38,38), rgb(249,115,22))' }}
               >
-                {saving ? 'Saving...' : 'Save Certification'}
+                {certFileUploading ? 'Saving...' : 'Save Certification'}
               </button>
             </div>
           )}
@@ -750,12 +775,24 @@ export default function ProfilePage() {
                         <div className="text-xs text-gray-400 mt-0.5 font-mono truncate">ID: {cert.credentialId}</div>
                       )}
                     </div>
-                    <button
-                      onClick={() => handleDeleteCert(cert.id)}
-                      className="text-gray-300 hover:text-red-400 transition-colors p-1 shrink-0"
-                    >
-                      🗑️
-                    </button>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {cert.fileUrl && (
+                        <a
+                          href={cert.fileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                        >
+                          ⬇️ View
+                        </a>
+                      )}
+                      <button
+                        onClick={() => handleDeleteCert(cert.id)}
+                        className="text-gray-300 hover:text-red-400 transition-colors p-1"
+                      >
+                        🗑️
+                      </button>
+                    </div>
                   </div>
                 );
               })}
@@ -888,7 +925,9 @@ export default function ProfilePage() {
           {(isHRAdmin || isManager) && (
             <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
               <div className="px-5 py-3 border-b border-gray-50 bg-gray-50/50 flex items-center justify-between">
-                <h3 className="font-semibold text-gray-800 text-sm">All Employee KRA Documents</h3>
+                <h3 className="font-semibold text-gray-800 text-sm">
+                  {isManager && !isHRAdmin ? "Team KRA Documents" : "All Employee KRA Documents"}
+                </h3>
                 <span className="text-xs text-gray-400">{allKRA.length} total</span>
               </div>
               {allKRA.length === 0 ? (
