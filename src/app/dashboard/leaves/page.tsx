@@ -316,8 +316,10 @@ export default function LeavesPage() {
     if (calSelectedDay !== null) {
       const [year, m] = calMonth.split('-').map(Number);
       const selectedDate = new Date(year, m - 1, calSelectedDay);
-      const start = new Date(l.startDate);
-      const end   = new Date(l.endDate);
+      const sd = new Date(l.startDate);
+      const ed = new Date(l.endDate);
+      const start = new Date(sd.getUTCFullYear(), sd.getUTCMonth(), sd.getUTCDate());
+      const end   = new Date(ed.getUTCFullYear(), ed.getUTCMonth(), ed.getUTCDate());
       if (selectedDate < start || selectedDate > end) return false;
     }
     return true;
