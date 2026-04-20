@@ -250,7 +250,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
                     </span>
                   )}
                 </div>
-                <button onClick={fetchNotifications}
+                <button onClick={() => fetchNotifications(false)}
                   title="Refresh"
                   className="text-slate-400 hover:text-slate-600 transition-colors text-base leading-none p-1 rounded-lg hover:bg-slate-50">
                   ↺
