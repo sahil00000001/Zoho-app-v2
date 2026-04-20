@@ -180,7 +180,7 @@ const nodeTypes = { orgNode: OrgNode };
 
 const defaultEdgeOptions: Partial<Edge> = {
   type: 'smoothstep',
-  markerEnd: { type: MarkerType.ArrowClosed, color: '#cbd5e1', width: 14, height: 14 },
+  markerStart: { type: MarkerType.ArrowClosed, color: '#cbd5e1', width: 14, height: 14 },
   style: { stroke: '#cbd5e1', strokeWidth: 1.5 },
   deletable: false,
   selectable: false,
