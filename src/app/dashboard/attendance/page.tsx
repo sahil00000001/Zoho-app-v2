@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { api, TeamDailyEntry } from "@/lib/api";
 
@@ -104,6 +104,10 @@ export default function AttendancePage() {
   const [teamFilter, setTeamFilter] = useState<TeamFilter>('ALL');
   const [teamSearch, setTeamSearch] = useState('');
 
+  // Live elapsed timer (seconds since check-in, updates every second)
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   // Regularization form
   const [regForm, setRegForm] = useState({ date: '', reason: '', requestedCheckIn: '', requestedCheckOut: '' });
   const [regLoading, setRegLoading] = useState(false);
@@ -131,6 +135,29 @@ export default function AttendancePage() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { fetchInitialData(); }, [fetchInitialData]);
+
+  // ── Auto-refresh today's record every 30s ────────────────────────────────
+  useEffect(() => {
+    const id = setInterval(async () => {
+      try {
+        const record = await api.getTodayAttendance();
+        setTodayRecord(record as AttendanceRecord);
+      } catch { /* silent background refresh */ }
+    }, 30000);
+    return () => clearInterval(id);
+  }, []);
+
+  // ── Live elapsed timer (ticks every second while session is active) ───────
+  useEffect(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    const checkInTime = todayRecord?.checkInTime;
+    const checkedOut = !!todayRecord?.checkOutTime;
+    if (!checkInTime || checkedOut) { setElapsedSeconds(0); return; }
+    const tick = () => setElapsedSeconds(Math.floor((Date.now() - new Date(checkInTime).getTime()) / 1000));
+    tick();
+    timerRef.current = setInterval(tick, 1000);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [todayRecord?.checkInTime, todayRecord?.checkOutTime]);
 
   // ── Refetch monthly when month changes ────────────────────────────────────
   const fetchMonthly = useCallback(async (month: string) => {
@@ -318,7 +345,21 @@ export default function AttendancePage() {
 
   const isCheckedIn = !!todayRecord?.checkInTime;
   const isCheckedOut = !!todayRecord?.checkOutTime;
-  const workPct = todayRecord?.workHours ? Math.min(100, (todayRecord.workHours / 8) * 100) : 0;
+  const activeSession = isCheckedIn && !isCheckedOut;
+
+  const fmtElapsed = (sec: number) => {
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    return `${h}h ${m}m`;
+  };
+
+  const displayHours = activeSession
+    ? fmtElapsed(elapsedSeconds)
+    : todayRecord?.workHours ? `${todayRecord.workHours}h` : '0h 0m';
+
+  const workPct = activeSession
+    ? Math.min(100, (elapsedSeconds / 3600 / 8) * 100)
+    : todayRecord?.workHours ? Math.min(100, (todayRecord.workHours / 8) * 100) : 0;
 
   return (
     <div className="p-4 md:p-6 space-y-4 md:space-y-6">
@@ -340,14 +381,14 @@ export default function AttendancePage() {
               className="px-5 py-2 text-white font-bold rounded-lg text-sm shadow-md shadow-orange-200 hover:opacity-90 transition-all active:scale-95 disabled:opacity-60 flex items-center gap-2"
               style={{ background: isWFH ? 'linear-gradient(135deg, #3b82f6, #2563eb)' : 'linear-gradient(135deg, #DC2626, #F97316)' }}>
               {actionLoading && <span className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />}
-              {isWFH ? '🏠 Clock In (WFH)' : 'Clock In'}
+              {isWFH ? '🏠 Check In (WFH)' : 'Check In'}
             </button>
           )}
           {isCheckedIn && !isCheckedOut && (
             <button onClick={handleCheckOut} disabled={actionLoading}
               className="px-5 py-2 bg-red-50 text-red-600 font-bold rounded-lg text-sm hover:bg-red-100 transition-all active:scale-95 border border-red-100 flex items-center gap-2">
               {actionLoading && <span className="w-4 h-4 rounded-full border-2 border-red-300 border-t-red-600 animate-spin" />}
-              Clock Out
+              Check Out
             </button>
           )}
           {isCheckedIn && isCheckedOut && (
@@ -397,14 +438,16 @@ export default function AttendancePage() {
             <p className="text-slate-500 text-sm">Checked out at {fmt(todayRecord?.checkOutTime ?? null)}</p>
           )}
           {todayRecord?.checkInAddress && (
-            <p className="text-xs text-slate-400 mt-1 max-w-[200px] truncate">📍 {todayRecord.checkInAddress}</p>
+            <p className="text-xs text-slate-400 mt-1 max-w-[260px] truncate" title={todayRecord.checkInAddress}>
+              📍 {todayRecord.checkInAddress.split(',').slice(0, 2).join(',')}
+            </p>
           )}
         </div>
 
         {/* Center: Progress */}
         <div className="flex-1 w-full max-w-sm text-center">
           <span className="text-4xl font-extrabold text-slate-900 tracking-tight">
-            {todayRecord?.workHours ? `${todayRecord.workHours}h` : '0h 0m'}
+            {displayHours}
           </span>
           <p className="text-slate-400 text-sm mb-3">of 8h 0m daily target</p>
           <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -422,7 +465,7 @@ export default function AttendancePage() {
             {[
               { label: 'Check In', value: fmt(todayRecord?.checkInTime ?? null) },
               { label: 'Check Out', value: fmt(todayRecord?.checkOutTime ?? null) },
-              { label: 'Hours', value: todayRecord?.workHours ? `${todayRecord.workHours}h` : '—' },
+              { label: 'Hours', value: activeSession ? fmtElapsed(elapsedSeconds) : (todayRecord?.workHours ? `${todayRecord.workHours}h` : '—') },
               { label: 'OT Hours', value: todayRecord?.overtimeHours ? `+${todayRecord.overtimeHours}h` : '0h 0m' },
             ].map(({ label, value }) => (
               <div key={label} className="text-center p-2.5 bg-slate-50 rounded-xl min-w-[80px]">
