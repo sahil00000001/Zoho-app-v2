@@ -61,73 +61,61 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
   const initials   = user ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase() : "U";
   const canApprove = isRole("MANAGER", "HR", "ADMIN");
 
-  // ── Build notification list ───────────────────────────────────────────────
-  const fetchNotifications = useCallback(async () => {
-    setNotifLoading(true);
-    const notifs: Notif[] = [];
+  // ── Single fetch → filter in JS ──────────────────────────────────────────
+  const fetchNotifications = useCallback(async (silent = false) => {
+    if (!silent) setNotifLoading(true);
+
+    type LeaveItem   = { id: string; startDate: string; endDate: string; days: number; status: string; leaveType: { name: string }; user: { id: string; firstName: string; lastName: string } };
+    type RegItem     = { id: string; date: string; reason: string; status: string; user: { id: string; firstName: string; lastName: string } };
+    type CompoffItem = { id: string; earnedDate: string; reason: string; status: string; user: { id: string; firstName: string; lastName: string } };
 
     try {
-      // ── Approver notifications (pending items needing action) ─────────────
+      // One request per endpoint — all fired in parallel
+      const [leavesRes, regsRes, compoffsRes] = await Promise.allSettled([
+        api.getAllLeaves() as Promise<LeaveItem[]>,
+        api.getRegularizations() as Promise<RegItem[]>,
+        api.getCompOffs() as Promise<CompoffItem[]>,
+      ]);
+
+      const leaves   = leavesRes.status   === "fulfilled" ? leavesRes.value   : [];
+      const regs     = regsRes.status     === "fulfilled" ? regsRes.value     : [];
+      const compoffs = compoffsRes.status === "fulfilled" ? compoffsRes.value : [];
+
+      const notifs: Notif[] = [];
+      const myId = user?.id;
+
+      // ── Pending items needing action (approvers) ──────────────────────────
       if (canApprove) {
-        // Pending leaves
-        const leaves = (await api.getAllLeaves({ status: "PENDING" })) as Array<{
-          id: string; startDate: string; endDate: string; days: number;
-          leaveType: { name: string };
-          user: { firstName: string; lastName: string };
-        }>;
-        for (const l of leaves.slice(0, 8)) {
+        for (const l of leaves.filter(l => l.status === "PENDING").slice(0, 8)) {
           notifs.push({
-            id: `leave-${l.id}`,
-            icon: "🌿",
+            id: `leave-${l.id}`, icon: "🌿",
             title: `${l.user.firstName} ${l.user.lastName} — ${l.leaveType.name}`,
             meta: `${l.days} day${l.days !== 1 ? "s" : ""} · ${fmtDate(l.startDate)} → ${fmtDate(l.endDate)}`,
-            badgeLabel: "Leave pending",
-            badgeColor: "orange",
-            href: "/dashboard/approvals",
+            badgeLabel: "Leave pending", badgeColor: "orange", href: "/dashboard/approvals",
           });
         }
-
-        // Pending regularizations
-        const regs = (await api.getRegularizations()) as Array<{
-          id: string; date: string; reason: string; status: string;
-          user: { firstName: string; lastName: string };
-        }>;
         for (const r of regs.filter(r => r.status === "PENDING").slice(0, 5)) {
           notifs.push({
-            id: `reg-${r.id}`,
-            icon: "🕐",
+            id: `reg-${r.id}`, icon: "🕐",
             title: `${r.user.firstName} ${r.user.lastName} — Attendance Correction`,
             meta: `${fmtDate(r.date)} · ${r.reason}`,
-            badgeLabel: "Regularization",
-            badgeColor: "blue",
-            href: "/dashboard/approvals",
+            badgeLabel: "Regularization", badgeColor: "blue", href: "/dashboard/approvals",
           });
         }
-
-        // Pending comp-offs
-        const compoffs = (await api.getCompOffs()) as Array<{
-          id: string; earnedDate: string; reason: string; status: string;
-          user: { firstName: string; lastName: string };
-        }>;
         for (const c of compoffs.filter(c => c.status === "PENDING").slice(0, 5)) {
           notifs.push({
-            id: `co-${c.id}`,
-            icon: "⏰",
+            id: `co-${c.id}`, icon: "⏰",
             title: `${c.user.firstName} ${c.user.lastName} — Comp-off Request`,
             meta: `Earned on ${fmtDate(c.earnedDate)} · ${c.reason}`,
-            badgeLabel: "Comp-off",
-            badgeColor: "blue",
-            href: "/dashboard/approvals",
+            badgeLabel: "Comp-off", badgeColor: "blue", href: "/dashboard/approvals",
           });
         }
       }
 
-      // ── Own leave status updates (all users — approved / rejected) ─────────
-      const myLeaves = (await api.getMyLeaves()) as Array<{
-        id: string; startDate: string; endDate: string; days: number;
-        status: string; leaveType: { name: string };
-      }>;
-      for (const l of myLeaves.filter(l => l.status === "APPROVED" || l.status === "REJECTED").slice(0, 5)) {
+      // ── Own resolved leaves (all users) — filter from same dataset ────────
+      for (const l of leaves
+        .filter(l => (canApprove ? l.user.id === myId : true) && (l.status === "APPROVED" || l.status === "REJECTED"))
+        .slice(0, 5)) {
         notifs.push({
           id: `my-leave-${l.id}`,
           icon: l.status === "APPROVED" ? "✅" : "❌",
@@ -139,40 +127,39 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
         });
       }
 
-      // ── Own regularization updates ────────────────────────────────────────
-      const myRegs = canApprove
-        ? [] // already fetched above as manager view
-        : (await api.getRegularizations()) as Array<{
-            id: string; date: string; reason: string; status: string;
-          }>;
-      for (const r of myRegs.filter(r => r.status === "APPROVED" || r.status === "REJECTED").slice(0, 3)) {
-        notifs.push({
-          id: `my-reg-${r.id}`,
-          icon: r.status === "APPROVED" ? "✅" : "❌",
-          title: `Your attendance correction was ${r.status === "APPROVED" ? "approved" : "rejected"}`,
-          meta: fmtDate(r.date),
-          badgeLabel: r.status,
-          badgeColor: r.status === "APPROVED" ? "green" : "red",
-          href: "/dashboard/attendance",
-        });
+      // ── Own resolved regularizations (employees — same regs dataset) ──────
+      if (!canApprove) {
+        for (const r of regs.filter(r => r.status === "APPROVED" || r.status === "REJECTED").slice(0, 3)) {
+          notifs.push({
+            id: `my-reg-${r.id}`,
+            icon: r.status === "APPROVED" ? "✅" : "❌",
+            title: `Your attendance correction was ${r.status === "APPROVED" ? "approved" : "rejected"}`,
+            meta: fmtDate(r.date),
+            badgeLabel: r.status, badgeColor: r.status === "APPROVED" ? "green" : "red",
+            href: "/dashboard/attendance",
+          });
+        }
       }
+
+      setNotifications(notifs);
+      setNotifBadge(notifs.filter(n => n.badgeColor === "orange" || n.badgeColor === "blue").length);
     } catch { /* silent */ }
 
-    setNotifications(notifs);
-    setNotifBadge(notifs.filter(n => n.badgeColor === "orange" || n.badgeColor === "blue").length);
-    setNotifLoading(false);
-  }, [canApprove]);
+    if (!silent) setNotifLoading(false);
+  }, [canApprove, user?.id]);
 
-  // ── Fetch badge count on mount and path change ────────────────────────────
+  // ── Fetch on mount + auto-refresh every 60s ───────────────────────────────
   useEffect(() => {
     if (!user) return;
-    api.getAllLeaves({ status: "PENDING" })
-      .then((d: unknown) => {
-        const pendingLeaves = (d as unknown[]).length;
-        setNotifBadge(pendingLeaves);
-      })
-      .catch(() => {});
-  }, [path, user, canApprove]);
+    fetchNotifications(true);
+    const id = setInterval(() => fetchNotifications(true), 60_000);
+    return () => clearInterval(id);
+  }, [user, fetchNotifications]);
+
+  // ── Refresh badge on navigation ───────────────────────────────────────────
+  useEffect(() => {
+    if (user) fetchNotifications(true);
+  }, [path]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Scroll shadow ─────────────────────────────────────────────────────────
   useEffect(() => {
@@ -200,7 +187,8 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
     const next = !showNotifs;
     setShowNotifs(next);
     setShowUserMenu(false);
-    if (next && notifications.length === 0) fetchNotifications();
+    // Full refresh (with spinner) only when explicitly opening the panel
+    if (next) fetchNotifications(false);
   };
 
   return (
