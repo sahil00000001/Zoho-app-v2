@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ATLAS — HR for Modern Teams",
+  title: "POD-Atlas — HR for Modern Teams",
   description: "Lightweight HR platform for 50-200 people orgs. Attendance, leaves, approvals, and more.",
   icons: {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }],

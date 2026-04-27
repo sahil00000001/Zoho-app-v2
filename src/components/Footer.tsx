@@ -16,7 +16,7 @@ export default function Footer() {
             A
           </div>
           <span className="text-xs text-slate-500">
-            © {year} <span className="font-semibold text-slate-700">ATLAS HR</span> · Built by PodTech
+            © {year} <span className="font-semibold text-slate-700">POD-Atlas HR</span> · Built by PodTech
           </span>
         </div>
 

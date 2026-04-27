@@ -56,7 +56,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
   const menuRef  = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
 
-  const meta       = PAGE_META[path] || { title: "ATLAS", icon: "⊞" };
+  const meta       = PAGE_META[path] || { title: "POD-Atlas", icon: "⊞" };
   const today      = new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" });
   const initials   = user ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase() : "U";
   const canApprove = isRole("MANAGER", "HR", "ADMIN");

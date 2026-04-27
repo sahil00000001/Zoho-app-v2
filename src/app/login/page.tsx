@@ -173,7 +173,7 @@ export default function LoginPage() {
             <div className="w-16 h-16 rounded-xl border-2 border-white/30 flex items-center justify-center mb-6 bg-white/10 backdrop-blur-sm">
               <span className="text-3xl font-black text-white">A</span>
             </div>
-            <h1 className="text-[28px] font-bold tracking-tight mb-1">ATLAS HR</h1>
+            <h1 className="text-[28px] font-bold tracking-tight mb-1">POD-Atlas HR</h1>
             <p className="text-white/80 text-sm font-medium mb-12">Workforce Platform</p>
             {/* Features */}
             <ul className="space-y-5 text-left w-full px-4">
@@ -197,11 +197,11 @@ export default function LoginPage() {
           <div className="lg:hidden mb-8 flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-black text-base"
               style={{ background: "linear-gradient(135deg, #DC2626, #F97316)" }}>A</div>
-            <span className="font-black text-xl text-slate-900">ATLAS HR</span>
+            <span className="font-black text-xl text-slate-900">POD-Atlas HR</span>
           </div>
           <LoginForm />
           <p className="absolute bottom-6 text-[11px] text-slate-400 tracking-wide font-medium">
-            ATLAS HR · Secured · v2.0
+            POD-Atlas HR · Secured · v2.0
           </p>
         </section>
       </div>

@@ -1,4 +1,4 @@
-# Atlas — Frontend
+# POD-Atlas — Frontend
 
 > HR management platform frontend built with Next.js 16, TypeScript, and Tailwind CSS v4.
 
@@ -24,7 +24,7 @@
 
 ## Overview
 
-Atlas is a professional HR self-service portal. Employees, managers, HR, and admins each get a tailored experience based on their role. Every feature is accessible from a clean, responsive sidebar.
+POD-Atlas is a professional HR self-service portal. Employees, managers, HR, and admins each get a tailored experience based on their role. Every feature is accessible from a clean, responsive sidebar.
 
 **Supported roles:**
 | Role | What they can do |

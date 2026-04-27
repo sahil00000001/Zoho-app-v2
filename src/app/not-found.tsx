@@ -74,7 +74,7 @@ export default function NotFound() {
       </div>
 
       {/* Subtle brand */}
-      <p className="mt-10 text-xs text-slate-300 font-medium tracking-widest uppercase">Atlas HR</p>
+      <p className="mt-10 text-xs text-slate-300 font-medium tracking-widest uppercase">POD-Atlas HR</p>
     </div>
   );
 }
